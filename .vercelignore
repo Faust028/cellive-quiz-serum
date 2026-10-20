@@ -1,0 +1,17 @@
+# Só a pasta public/ vai para o ar. O resto é material de trabalho.
+# (padrões com "/" no início valem só para a raiz do projeto)
+node_modules
+/Backup imagens originais
+/Fontes
+/Ativos
+/Sessões
+/Analise pós respostas
+/specs
+/.claude
+/landing page serum facial
+/*.md
+/*.webp
+/*.png
+/*.jpg
+/*.jpeg
+/*.pdf

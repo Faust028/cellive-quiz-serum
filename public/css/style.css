@@ -1,0 +1,796 @@
+/* =========================================================
+   CELLIVE QUIZ — base mobile 375px (referências em 2x)
+   ========================================================= */
+
+/* ---------- Fonte da marca: Acumin (Adobe) ----------
+   Um único arquivo variável (Acumin Variable Concept) cobre todos os pesos,
+   a largura Condensed e o itálico. Arquivo reduzido a caracteres latinos/PT
+   e aos eixos usados: peso 300–800, largura 67,5–100, inclinação 0–12.
+   Fonte original: /Fontes/AcuminVariableConcept.otf */
+@font-face {
+  font-family: 'Acumin Pro';
+  src: url('/assets/fonts/AcuminVariable-Latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 100%;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Acumin Pro Condensed';
+  src: url('/assets/fonts/AcuminVariable-Latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 67.5%;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  --blue: #b0c6de;          /* azul Cellive (botão, destaque, etapa ativa) */
+  --blue-glow: rgba(176, 198, 222, .65);
+  --slate: #5f6b7a;         /* cinza-azulado (números, barra de progresso) */
+  --black: #000;
+  --text: #4d4d4d;          /* texto secundário */
+  --muted: #a6a6a6;         /* textos de apoio */
+  --line: #e1e1e1;          /* bordas / trilhos */
+  --white: #fff;
+
+  --tray-height: 78px;      /* bandeja de ativos: título (20px) + painel (58px) — reduzida ~30% em 2026-10-16 */
+
+  --font: 'Acumin Pro', Arial, sans-serif;
+  --font-cond: 'Acumin Pro Condensed', 'Arial Narrow', sans-serif;
+  --font-logo: 'Montserrat', Arial, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100svh;
+  position: relative;
+  overflow-x: clip;   /* "clip" e não "hidden": hidden criaria um contêiner de rolagem e quebraria o position: sticky */
+}
+
+/* ---------- Etapas ---------- */
+.step {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 0 16px;
+}
+.step.is-active { display: flex; animation: stepIn .35s ease both; }
+
+@keyframes stepIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Logo ---------- */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 41px;
+  height: 20px;
+  line-height: 1;
+  color: #1c1c1c;
+}
+.logo__main {
+  font-family: var(--font-logo);
+  font-weight: 600;
+  font-size: 21.6px;
+  letter-spacing: .085em;
+}
+.logo__sub {
+  font-family: var(--font-logo);
+  font-weight: 600;
+  font-size: 6.4px;
+  letter-spacing: .62em;
+  margin-left: 10px;
+  margin-top: 1px;
+}
+
+/* =========================================================
+   SESSÃO 1 — Capa
+   ========================================================= */
+.intro__title {
+  margin-top: 155.5px;
+  font-size: 29px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  text-align: center;
+}
+.intro__highlight {
+  display: inline-block;
+  background: var(--blue);
+  font-family: var(--font-cond);
+  font-weight: 600;
+  font-size: 31.2px;
+  line-height: 30px;
+  letter-spacing: -.005em;
+  padding: 0 1px;
+  vertical-align: -1px;
+}
+
+.intro__subtitle {
+  margin-top: 18px;
+  font-size: 16.2px;
+  line-height: 19.5px;
+  color: var(--text);
+  text-align: center;
+  letter-spacing: -.003em;
+}
+
+.intro__cta {
+  margin-top: 41px;
+  width: 250px;
+  height: 51px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 0 10px 2px var(--blue-glow);
+  color: var(--white);
+  font-family: var(--font-cond);
+  font-weight: 600;
+  font-size: 23.6px;
+  letter-spacing: .002em;
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+}
+.intro__cta:hover { filter: brightness(1.03); }
+.intro__cta:active { transform: scale(.97); }
+
+.intro__info {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 9.4px;
+  font-style: normal;
+  font-variation-settings: 'slnt' 12; /* itálico da Acumin variável */
+  font-weight: 600;
+}
+.intro__info li { display: flex; align-items: center; gap: 5px; }
+.intro__info svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.intro__info .icon-truck { width: 21px; height: 12px; margin-right: 4px; }
+
+.intro__social {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 33.5px;
+  margin-right: 4px;
+}
+.intro__avatars {
+  width: 76px;
+  height: 33px;
+  margin-top: -10.5px;
+}
+.intro__social p {
+  display: flex;
+  align-items: flex-start;
+  margin-left: 6px;
+  font-size: 8.4px;
+  line-height: 11.4px;
+  color: var(--black);
+}
+.intro__social-name { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.verified { width: 10px; height: 10px; margin-left: 1px; }
+.intro__social-count { margin-left: 4px; }
+.intro__social-count b { font-weight: 700; }
+
+.intro__korea {
+  display: flex;
+  align-items: center;
+  margin-top: 59px;
+  margin-left: 6px;
+}
+.flag-kr { width: 35px; height: 27.5px; }
+.intro__korea p {
+  margin-left: 10.5px;
+  font-size: 10.9px;
+  line-height: 13.4px;
+  font-weight: 700;
+  color: #575757;
+}
+
+.intro__footer {
+  margin-top: auto;
+  margin-bottom: 43px;
+  padding-top: 40px;
+  font-size: 9.2px;
+  color: #555;
+  text-align: center;
+}
+.intro__footer a { color: inherit; text-decoration: underline; text-underline-offset: 1.5px; }
+
+/* =========================================================
+   STEPPER 1-2-3 (Sessões 2, 3 e 4)
+   ========================================================= */
+.stepper {
+  list-style: none;
+  display: flex;
+  gap: 11px;
+  margin-top: 22px;
+  padding: 4px 6.5px;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .085);
+}
+.stepper li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-family: var(--font-cond);
+  font-weight: 600;
+  font-size: 22px;
+  padding-top: 2px;
+  color: var(--slate);
+  transition: background-color .3s cubic-bezier(.4, 0, .2, 1), color .3s cubic-bezier(.4, 0, .2, 1), transform .3s cubic-bezier(.4, 0, .2, 1);
+}
+.stepper li.is-done   { background: #e0e0e0; color: var(--white); }
+.stepper li.is-active { background: var(--blue); color: var(--white); }   /* número branco (pedido da usuária, 2026-10-19) */
+.step.is-active .stepper li.is-active { animation: stepPop .4s cubic-bezier(.4, 0, .2, 1) both; }
+
+@keyframes stepPop {
+  from { background: transparent; transform: scale(.85); }
+  to   { background: var(--blue); transform: none; }
+}
+
+/* =========================================================
+   PERGUNTAS (Sessões 2, 3, 4 e 7)
+   ========================================================= */
+.question__title {
+  margin-top: 35px;
+  min-height: 82.5px;
+  max-width: 280px;
+  font-size: 21.3px;
+  line-height: 25.8px;
+  font-weight: 700;
+  letter-spacing: -.005em;
+  text-align: center;
+}
+
+/* Pergunta logo abaixo da barra de progresso (Sessão 7) */
+.question__title--after-progress {
+  margin-top: 64.5px;
+  min-height: 93px;
+}
+
+.options--4 { gap: 17px; }
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 16.5px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 13.5px;
+  width: 100%;
+  min-height: 47.5px;         /* 1 linha = 47,5px como na referência; texto longo quebra em 2 linhas */
+  padding: 7px 10px 4px 20px;
+  line-height: 1.15;
+  border: 0;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 1.5px 10px rgba(0, 0, 0, .1), 0 0 0 0 var(--blue);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 700;
+  color: #4b4b4b;
+  text-align: left;
+  letter-spacing: -.012em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: box-shadow .2s cubic-bezier(.4, 0, .2, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), transform .15s ease;
+}
+/* Texto longo demais para uma linha: quebra em 2 e a pílula cresce */
+.option--2-linhas { white-space: normal; padding-right: 18px; }
+.option:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, .1), 0 0 0 1px rgba(176, 198, 222, .6); }
+.option:active { transform: scale(.985); }
+
+.option__radio {
+  position: relative;
+  flex: none;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  border: 1.6px solid #dedede;
+  transition: border-color .2s cubic-bezier(.4, 0, .2, 1), background-color .2s cubic-bezier(.4, 0, .2, 1);
+}
+.option__radio::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--white);
+  transform: scale(0);
+  transition: transform .2s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Estado selecionado (comportamento inspirado na Tonaface) */
+.option.is-selected {
+  background: #f5f8fc;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, .1), 0 0 0 2px var(--blue);
+}
+.option.is-selected .option__radio { border-color: var(--blue); background: var(--blue); }
+.option.is-selected .option__radio::after { transform: scale(1); }
+
+/* =========================================================
+   SESSÃO 5 — Resultado 88%
+   ========================================================= */
+.result__ring {
+  position: relative;
+  width: 139px;
+  height: 139px;
+  margin-top: 50px;
+}
+.result__ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);  /* começa no topo, sentido horário */
+}
+.result__track,
+.result__progress {
+  fill: none;
+  stroke-width: 12.5;
+}
+.result__track { stroke: #e2e2e2; }
+.result__progress {
+  stroke: var(--blue);
+  stroke-linecap: round;
+  /* circunferência = 2π·63.25 ≈ 397.4 — o JS controla o dashoffset */
+  stroke-dasharray: 397.4;
+  stroke-dashoffset: 397.4;
+}
+.result__value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+  font-family: var(--font-cond);
+  font-weight: 600;
+  font-size: 47.6px;
+  letter-spacing: -.01em;
+  color: var(--slate);
+}
+
+.result__text {
+  margin-top: 67px;
+  text-align: center;
+  font-family: var(--font-cond);
+  font-weight: 600;
+  color: var(--slate);
+}
+.result__line1 {
+  display: block;
+  font-size: 21.8px;
+  line-height: 22px;
+}
+.result__line1 em {
+  font-family: var(--font);
+  font-weight: 700;
+  font-style: normal;
+  font-variation-settings: 'slnt' 12; /* itálico da Acumin variável */
+  font-size: 20.2px;
+  color: var(--black);
+  margin-right: 1px;
+}
+.result__line2 {
+  display: block;
+  margin-top: 5px;
+  font-size: 21.6px;
+  line-height: 25.5px;
+}
+
+/* =========================================================
+   BARRA DE PROGRESSO (Sessões 6 e 7)
+   ========================================================= */
+.progress {
+  width: 314.5px;
+  max-width: 100%;
+  height: 12px;
+  margin-top: 19px;
+  border-radius: 999px;
+  background: #e0e0e0;
+  overflow: hidden;
+}
+.progress__fill {
+  display: block;
+  height: 100%;
+  width: 0;                 /* calculado no quiz.js: respondidas ÷ total de perguntas */
+  border-radius: inherit;
+  background: #626f7f;
+  transition: width .6s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* =========================================================
+   SESSÃO 6 — Idade
+   ========================================================= */
+.age__title {
+  margin-top: 52.5px;
+  font-size: 21.2px;
+  line-height: 26px;
+  font-weight: 700;
+  letter-spacing: -.005em;
+  text-align: center;
+}
+.age__subtitle {
+  margin-top: 11.5px;
+  font-size: 14.3px;
+  line-height: 17px;
+  color: #a8a8a8;
+  text-align: center;
+}
+
+.age__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 160.5px);
+  gap: 17.5px;
+  margin-top: 14.5px;
+}
+
+.age-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 199px;
+  padding: 11.5px 14px 0;
+  border: 0;
+  border-radius: 20px;
+  background: var(--white);
+  box-shadow: 0 1.5px 10px rgba(0, 0, 0, .1), 0 0 0 0 var(--blue);
+  font-family: var(--font);
+  cursor: pointer;
+  transition: box-shadow .2s cubic-bezier(.4, 0, .2, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), transform .15s ease;
+}
+.age-card img {
+  display: block;
+  width: 133px;
+  height: 144px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.age-card span {
+  margin-top: 14.5px;
+  font-size: 15.5px;
+  line-height: 17px;
+  font-weight: 700;
+  color: #4b4b4b;
+  white-space: nowrap;
+}
+.age-card:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, .1), 0 0 0 1px rgba(176, 198, 222, .6); }
+.age-card:active { transform: scale(.98); }
+.age-card.is-selected {
+  background: #f5f8fc;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, .1), 0 0 0 2px var(--blue);
+}
+
+.result__photo {
+  display: block;
+  width: 280px;
+  height: 175px;
+  margin-top: 5px;
+  border-radius: 24px;
+  object-fit: cover;
+}
+
+/* =========================================================
+   SESSÃO 8 — Pergunta com foto
+   ========================================================= */
+.question__title--photo {
+  margin-top: 52.5px;
+  min-height: 0;
+  max-width: 300px;
+  line-height: 25.5px;
+}
+.question__photo {
+  display: block;
+  width: 314px;
+  max-width: 100%;
+  height: 200px;
+  margin-top: 5px;
+  border-radius: 15px;        /* raio medido na referência da Sessão 8 */
+  object-fit: cover;
+}
+.options--after-photo {
+  gap: 17px;
+  margin-top: 22px;
+}
+
+/* Pergunta com foto + 4 opções (Sessão 17): versão compacta para caber
+   acima da bandeja em celulares (~660px de altura útil) */
+.step--compacta .question__title--photo { margin-top: 26px; }
+.step--compacta .question__photo { height: 130px; object-position: center 30%; }
+.step--compacta .options--after-photo { margin-top: 16px; gap: 12px; }
+
+/* =========================================================
+   SESSÃO 9 — Dores (múltipla escolha)
+   ========================================================= */
+.pains__subtitle {
+  margin-top: 3px;
+  font-size: 14.3px;
+  line-height: 17.5px;
+  color: #a8a8a8;
+  text-align: center;
+}
+.pains__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 109px);
+  column-gap: 10.5px;
+  row-gap: 12px;
+  margin-top: 17px;
+}
+.pain-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 135px;
+  padding: 7px 0 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--white);
+  box-shadow: 0 1.5px 10px rgba(0, 0, 0, .1), 0 0 0 0 var(--blue);
+  font-family: var(--font);
+  cursor: pointer;
+  transition: box-shadow .2s cubic-bezier(.4, 0, .2, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), transform .15s ease;
+}
+.pain-card img {
+  display: block;
+  width: 91px;
+  height: 99px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.pain-card span {
+  margin-top: 8.5px;
+  font-size: 10.8px;
+  line-height: 13px;
+  font-weight: 700;
+  color: #4b4b4b;
+  white-space: nowrap;
+}
+.pain-card:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, .1), 0 0 0 1px rgba(176, 198, 222, .6); }
+.pain-card:active { transform: scale(.97); }
+.pain-card.is-selected {
+  background: #f5f8fc;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, .1), 0 0 0 2px var(--blue);
+}
+
+/* Botão CONTINUAR (mesmo estilo do CTA da capa) */
+.btn-continue {
+  /* Fica no lugar da referência; em telas baixas "gruda" logo acima da bandeja
+     de ativos (título 26px + painel 83px + 16px de folga) e nunca some atrás dela */
+  position: sticky;
+  bottom: calc(var(--tray-height) + 16px);
+  z-index: 5;
+  flex: none;
+  margin-top: 38px;
+  width: 153px;
+  height: 50.5px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 0 10px 2px var(--blue-glow);
+  color: var(--white);
+  font-family: var(--font-cond);
+  font-weight: 600;
+  font-size: 22.7px;
+  letter-spacing: .01em;
+  cursor: pointer;
+  transition: opacity .25s ease, box-shadow .25s ease, transform .15s ease;
+}
+.btn-continue:active { transform: scale(.97); }
+.btn-continue:disabled {
+  /* cor sólida (azul 45% sobre branco) em vez de opacidade: o botão pode ficar
+     por cima das fotos quando gruda acima da bandeja, e não pode ficar transparente */
+  background: #dbe5f0;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* =========================================================
+   BANDEJA DE ATIVOS (Sessões 6–10) — fixa no rodapé
+   ========================================================= */
+.step[data-tray] { padding-bottom: 100px; }   /* conteúdo não fica escondido atrás da bandeja */
+
+.tray {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 10;
+  width: 100%;
+  max-width: 430px;
+  transform: translate(-50%, 100%);
+  visibility: hidden;
+  transition: transform .5s cubic-bezier(.4, 0, .2, 1), visibility 0s linear .5s;
+}
+.tray.is-visible {
+  transform: translate(-50%, 0);
+  visibility: visible;
+  transition: transform .5s cubic-bezier(.4, 0, .2, 1), visibility 0s;
+}
+.tray__title {
+  padding-bottom: 4px;
+  background: var(--white);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  color: #a3a3a3;
+  text-align: center;
+}
+.tray__list {
+  list-style: none;
+  overflow: hidden;      /* com muitos ativos, os mais antigos saem pela direita */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 58px;
+  padding: 0 10px 6px;
+  background: var(--white);
+  box-shadow: 0 -5px 10px rgba(0, 0, 0, .045);
+}
+
+.ativo {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  will-change: transform;   /* animações de entrada/reordenação feitas no quiz.js */
+}
+.ativo img { display: block; width: auto; height: 40px; }   /* padrão: frascos/texturas novas */
+.ativo--ah img { width: 43px; height: 32px; }      /* textura da referência (Ácido Hialurônico) */
+.ativo--largo img { width: 46px; height: auto; }   /* imagem horizontal (Acetyl Hexapeptide-8) */
+.ativo--retinal img { width: 39px; height: 40px; }
+.ativo--retinal { gap: 1px; }
+.ativo--pdrn img { width: 38px; height: 38px; }
+.ativo { flex: none; }   /* não espremer os itens quando a fila passa da largura */
+.ativo span {
+  font-size: 8.6px;
+  line-height: 10.6px;
+  font-weight: 700;
+  color: #75828b;
+}
+
+/* =========================================================
+   SESSÃO 18 — Análise pós-respostas
+   ========================================================= */
+.analysis__title {
+  display: grid;            /* as duas frases ocupam o mesmo lugar e trocam com fade */
+  margin-top: 99px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 23.5px;
+  line-height: 1;
+  letter-spacing: -.003em;
+  color: #111;
+  text-align: center;
+  white-space: nowrap;
+}
+.analysis__light { font-weight: 300; }
+.analysis__phase { grid-area: 1 / 1; transition: opacity .4s ease; }
+.analysis__phase--2 { opacity: 0; }
+.step--analysis.is-phase-2 .analysis__phase--1 { opacity: 0; }
+.step--analysis.is-phase-2 .analysis__phase--2 { opacity: 1; }
+
+.analysis__ring {
+  position: relative;
+  width: 159px;
+  height: 159px;
+  margin-top: 40px;
+}
+.analysis__ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.analysis__track,
+.analysis__progress { fill: none; stroke-width: 15; }
+.analysis__track { stroke: #e0e0e0; }
+.analysis__progress { stroke: var(--blue); stroke-linecap: round; }
+.analysis__value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 48px;
+  letter-spacing: -.01em;
+  color: #5d646a;
+}
+
+/* Fase 1 (anel + etapas) e fase 2 (frasco grande) ocupam o mesmo espaço; troca com fade */
+.analysis__body { display: grid; justify-items: center; }
+.analysis__p1,
+.analysis__p2 {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity .45s ease;
+}
+.analysis__p2 { opacity: 0; }
+.step--analysis.is-phase-2 .analysis__p1 { opacity: 0; }
+.step--analysis.is-phase-2 .analysis__p2 { opacity: 1; }
+
+.analysis__stage { margin-top: 36px; }
+
+.analysis__steps { list-style: none; width: 282px; }
+.analysis__steps li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 13.5px;
+  border-bottom: 1px solid #e1e1e3;
+}
+.analysis__steps li:first-child { padding-top: 0; }
+.analysis__steps span {
+  margin-top: 14px;
+  height: 25px;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 11.6px;
+  line-height: 12px;
+  letter-spacing: .005em;
+  color: #dcdcde;                     /* etapa futura */
+  transition: color .3s ease;
+}
+.analysis__icon {
+  width: 29px;
+  height: 29px;
+  fill: none;
+  stroke: #dadadc;                    /* etapa futura */
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  transition: stroke .3s ease;
+}
+.analysis__icon .thick { stroke-width: 2.6; }
+.analysis__icon .dash { stroke-dasharray: 2.5 2; }
+.analysis__icon--wide { width: 41.5px; height: 28px; }
+.analysis__icon--small { width: 21.5px; height: 21.5px; margin: 3.5px 0; }
+
+.analysis__steps li.is-active span { color: #111; }
+.analysis__steps li.is-active .analysis__icon { stroke: var(--blue); }
+.analysis__steps li.is-done span { color: #737373; }
+.analysis__steps li.is-done .analysis__icon { stroke: #737375; }
+
+.analysis__bottle {
+  width: 85px;              /* referência v2: 1,23× o desenho original */
+  height: 278.5px;
+  margin-top: 83.5px;       /* topo do frasco a 268 px do topo da tela */
+}
+.analysis__bottle-empty { fill: #dadbe0; }
+.analysis__bottle-fill { fill: #1b1b1b; }
+

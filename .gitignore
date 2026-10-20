@@ -1,0 +1,27 @@
+# Dependências
+node_modules/
+
+# Material de trabalho (fica só no computador)
+/Fontes/
+/Backup imagens originais/
+/Ativos/
+/Sessões/
+/Analise pós respostas/
+/*.webp
+/*.png
+/*.jpg
+/*.jpeg
+/*.pdf
+
+# Outro projeto dentro da pasta (página de venda?) — fora deste repositório até a usuária decidir
+/landing page serum facial/
+
+# Ferramentas locais
+/.claude/
+/.vercel/
+public/__*.html
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
