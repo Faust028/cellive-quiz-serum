@@ -85,7 +85,9 @@ Pílula de 250×51 px, fundo `--blue`, texto branco condensado de 24 px, brilho 
 - Radio de 19 px com borda de 1,6 px `#dedede`, a 20 px da esquerda. Texto a 13,5 px do radio.
 - Espaço entre opções: 16,5 px (3 opções) e 17 px (4 opções).
 - O título da pergunta tem altura mínima fixa, para as opções começarem sempre a 249 px do topo.
-- Padrão: uma linha só (`white-space: nowrap`, altura mínima de 47,5 px). Texto que não cabe usa `.option--2-linhas`: quebra em 2 linhas e a pílula cresce (ex.: "Apenas quando fico muito tempo no sol.", Sessão 14). Não liberar a quebra para todas: "Queria ter uma pele radiante e viçosa." (Sessão 2) quebraria.
+- **Texto sempre dentro da pílula** (desde 2026-10-20; substitui o antigo `nowrap` + `.option--2-linhas`): todas as opções quebram linha quando o texto não cabe (`overflow-wrap: break-word`, `text-wrap: pretty`), e a pílula cresce (altura mínima de 47,5 px, padding 8/12/7/20 px, `line-height: 1.2`). **Nunca voltar a usar `nowrap` nas opções**: com fonte reserva, zoom ou "texto grande" do celular, a frase passava da borda.
+- Fonte das opções: `clamp(15px, 4.3vw, 16px)` — 16 px a partir de 372 px de largura (na tela da referência fica 15,9 px e "Queria ter uma pele radiante e viçosa." cabe em 1 linha); em telas mais estreitas desce até 15 px antes de quebrar linha.
+- Na tela da referência (370 px), só as frases realmente longas quebram: "Apenas quando fico muito tempo no sol." (S14) e "Sinto que minha pele está envelhecida." (S16).
 
 ### Barra de progresso (Sessões 6–17)
 - Barra de 314,5×12 px, totalmente arredondada, trilho `#e0e0e0`, preenchimento `#626f7f`.
@@ -174,7 +176,11 @@ Em telas como a das referências (≥ 760 px de altura, 370–430 px de largura)
 - **Altura ≤ 740 px**: menos espaço acima do título (30 px) e entre as opções (13 px); idade com cards de 172 px (foto 118×120); dores com cards de 112 px (foto 80×78) e CONTINUAR 18 px abaixo da grade.
 - **Altura ≤ 600 px** (iPhone SE antigo): cards ainda menores, e o CONTINUAR deixa de ser sticky (fica no fluxo, com um pouco de rolagem) para não cobrir os cards.
 - **Largura ≤ 380 px**: as grades da idade e das dores se ajustam à largura (colunas `minmax`); **≤ 365 px**: opções com texto longo quebram em 2 linhas.
-- Conferido sem problemas em 360×640, 375×667, 390×664, 412×780, 412×915 e 370×800. Em 320×568 precisa rolar ~10–20 px nas Sessões 9 e 17.
+- **Nada com tamanho fixo que prenda texto** (revisão de 2026-10-20): botão da capa (`min-width: min(250px, 100%)`, `min-height: 51px`), CONTINUAR (`min-width: 153px`, `min-height`), cards de idade e de dores (`min-height`), rótulos dos cards, título e etapas da análise — todos quebram linha e crescem em vez de vazar.
+- **Altura ≤ 600 px** também compacta: logo a 26 px do topo, barra 14 px abaixo, opções com 44 px de altura mínima (área de toque) e 10 px entre elas, fotos de pergunta até 80 px, capa com o título a 64 px, tela de análise com anel de 128 px.
+- **Largura ≤ 365 px**: o `<br>` do subtítulo da capa some e a frase se distribui sozinha (antes sobrava "com" sozinho numa linha).
+- **Auditoria automática** (texto fora de botão/opção/card, elemento fora da largura, clicável escondido atrás da bandeja, toque < 44 px, clicáveis sobrepostos) em todas as sessões, inclusive as duas fases da análise, em 3 condições — fonte normal, fonte reserva Arial (fonte ainda não carregada) e texto 15% maior (zoom/"texto grande" do celular): **tudo ok** em 320×568, 360×640, 360×740, 370×800, 375×667, 390×664, 390×844, 430×932, 768×1024, 1024×768, 1366×657 e 1920×969. Única exceção: 320×568 com texto 15% maior, onde a última opção da S17 fica 3 px sob a bandeja (resolve com rolagem).
+- Em telas largas (tablet, notebook, computador), o quiz continua como uma coluna de até 430 px centralizada, com a bandeja da mesma largura.
 
 ## Estados e interações
 

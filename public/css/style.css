@@ -134,8 +134,11 @@ html, body {
 
 .intro__cta {
   margin-top: 41px;
-  width: 250px;
-  height: 51px;
+  width: auto;                /* 250px na referência; cresce se o texto precisar */
+  min-width: min(250px, 100%);
+  max-width: 100%;
+  min-height: 51px;
+  padding: 6px 12px 4px;
   border: 0;
   border-radius: 999px;
   background: var(--blue);
@@ -144,7 +147,9 @@ html, body {
   font-family: var(--font-cond);
   font-weight: 600;
   font-size: 23.6px;
+  line-height: 1.1;
   letter-spacing: .002em;
+  text-wrap: balance;
   cursor: pointer;
   transition: transform .15s ease, filter .15s ease;
 }
@@ -296,25 +301,27 @@ html, body {
   align-items: center;
   gap: 13.5px;
   width: 100%;
-  min-height: 47.5px;         /* 1 linha = 47,5px como na referência; texto longo quebra em 2 linhas */
-  padding: 7px 10px 4px 20px;
-  line-height: 1.15;
+  /* 1 linha = 47,5px como na referência. Texto longo QUEBRA LINHA e a pílula cresce:
+     nunca usar nowrap aqui — com fonte reserva, zoom ou "texto grande" do celular
+     a frase passava da borda (problema corrigido em 2026-10-20). */
+  min-height: 47.5px;
+  padding: 8px 12px 7px 20px;
+  line-height: 1.2;
   border: 0;
   border-radius: 999px;
   background: var(--white);
   box-shadow: 0 1.5px 10px rgba(0, 0, 0, .1), 0 0 0 0 var(--blue);
   font-family: var(--font);
-  font-size: 16px;
+  font-size: clamp(15px, 4.3vw, 16px);    /* 16px a partir de 372px de largura */
   font-weight: 700;
   color: #4b4b4b;
   text-align: left;
   letter-spacing: -.012em;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  text-wrap: pretty;                      /* evita palavra sozinha na 2ª linha */
   cursor: pointer;
   transition: box-shadow .2s cubic-bezier(.4, 0, .2, 1), background-color .2s cubic-bezier(.4, 0, .2, 1), transform .15s ease;
 }
-/* Texto longo demais para uma linha: quebra em 2 e a pílula cresce */
-.option--2-linhas { white-space: normal; padding-right: 18px; }
 .option:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, .1), 0 0 0 1px rgba(176, 198, 222, .6); }
 .option:active { transform: scale(.985); }
 
@@ -468,8 +475,8 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 199px;
-  padding: 11.5px 14px 0;
+  min-height: 199px;
+  padding: 11.5px 14px 10px;
   border: 0;
   border-radius: 20px;
   background: var(--white);
@@ -491,7 +498,9 @@ html, body {
   line-height: 17px;
   font-weight: 700;
   color: #4b4b4b;
-  white-space: nowrap;
+  text-align: center;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
 .age-card:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, .1), 0 0 0 1px rgba(176, 198, 222, .6); }
 .age-card:active { transform: scale(.98); }
@@ -559,8 +568,8 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 135px;
-  padding: 7px 0 0;
+  min-height: 135px;
+  padding: 7px 4px 8px;
   border: 0;
   border-radius: 12px;
   background: var(--white);
@@ -582,7 +591,9 @@ html, body {
   line-height: 13px;
   font-weight: 700;
   color: #4b4b4b;
-  white-space: nowrap;
+  text-align: center;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
 .pain-card:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, .1), 0 0 0 1px rgba(176, 198, 222, .6); }
 .pain-card:active { transform: scale(.97); }
@@ -600,8 +611,10 @@ html, body {
   z-index: 5;
   flex: none;
   margin-top: 38px;
-  width: 153px;
-  height: 50.5px;
+  min-width: 153px;
+  max-width: 100%;
+  min-height: 50.5px;
+  padding: 4px 26px 2px;
   border: 0;
   border-radius: 999px;
   background: var(--blue);
@@ -698,7 +711,8 @@ html, body {
   letter-spacing: -.003em;
   color: #111;
   text-align: center;
-  white-space: nowrap;
+  max-width: 100%;
+  text-wrap: balance;
 }
 .analysis__light { font-weight: 300; }
 .analysis__phase { grid-area: 1 / 1; transition: opacity .4s ease; }
@@ -747,7 +761,7 @@ html, body {
 
 .analysis__stage { margin-top: 36px; }
 
-.analysis__steps { list-style: none; width: 282px; }
+.analysis__steps { list-style: none; width: 282px; max-width: 100%; }
 .analysis__steps li {
   display: flex;
   flex-direction: column;
@@ -758,7 +772,10 @@ html, body {
 .analysis__steps li:first-child { padding-top: 0; }
 .analysis__steps span {
   margin-top: 14px;
-  height: 25px;
+  min-height: 25px;
+  padding-bottom: 2px;
+  max-width: 100%;
+  text-align: center;
   font-family: var(--font);
   font-weight: 700;
   font-size: 11.6px;
@@ -827,7 +844,7 @@ html, body {
   /* Idade (Sessão 6): cards e fotos menores */
   .age__title { margin-top: 36px; }
   .age__grid { gap: 14px; }
-  .age-card { height: 172px; padding-top: 9px; }
+  .age-card { min-height: 172px; padding-top: 9px; }
   .age-card img { width: 118px; height: 120px; }
   .age-card span { margin-top: 11px; }
 
@@ -835,16 +852,14 @@ html, body {
   .question__title--photo + .pains__subtitle { margin-top: 2px; }
   .step--pains .question__title--photo { margin-top: 26px; }
   .pains__grid { row-gap: 10px; margin-top: 12px; }
-  .pain-card { height: 112px; padding-top: 6px; }
+  .pain-card { min-height: 112px; padding-top: 6px; }
   .pain-card img { width: 80px; height: 78px; }
   .pain-card span { margin-top: 7px; }
   .btn-continue { margin-top: 18px; }
 }
 
 /* Telas estreitas (≤ 365 px): texto longo das opções quebra em 2 linhas em vez de ser cortado */
-@media (max-width: 365px) {
-  .option { white-space: normal; padding-right: 16px; }
-}
+
 /* Telas estreitas (≤ 380 px): grades da idade e das dores se ajustam à largura */
 @media (max-width: 380px) {
   .age__grid { width: 100%; grid-template-columns: repeat(2, minmax(0, 160.5px)); justify-content: center; }
@@ -859,14 +874,46 @@ html, body {
 @media (max-height: 600px) {
   .age__title { margin-top: 22px; }
   .age__subtitle { margin-top: 6px; }
-  .age-card { height: 150px; }
+  .age-card { min-height: 150px; }
   .age-card img { height: 100px; }
   .step--pains .question__title--photo { margin-top: 16px; }
-  .pain-card { height: 98px; }
+  .pain-card { min-height: 98px; }
   .pain-card img { height: 66px; }
   /* sem espaço para tudo: o botão volta ao fluxo normal (abaixo dos cards, com rolagem)
      em vez de flutuar por cima deles */
-  .btn-continue { position: static; margin-top: 12px; height: 46px; }
+  .btn-continue { position: static; margin-top: 12px; min-height: 46px; }
   .step--compacta .question__title--photo { margin-top: 12px; }
   .step--compacta .options--after-photo { margin-top: 10px; gap: 8px; }
+
+  /* Cabeçalho mais junto ao topo e perguntas mais compactas (toque mínimo de 44px) */
+  .logo { margin-top: 26px; }
+  .progress { margin-top: 14px; }
+  .question__title--after-progress { margin-top: 26px; min-height: 0; margin-bottom: 16px; }
+  .question__title--photo { margin-top: 16px; }
+  .options { gap: 10px; }
+  .options--after-photo { margin-top: 10px; gap: 9px; }
+  .option { min-height: 44px; }
+  .step:has(> .question__photo) > .question__photo { min-height: 80px; }
+  .pains__grid { row-gap: 8px; }
+  .pain-card { min-height: 92px; }
+  .pain-card img { height: 60px; }
+}
+/* Telas estreitas: quebras de linha fixas (<br>) do subtítulo da capa deixavam
+   uma palavra sozinha; a frase passa a se distribuir sozinha */
+@media (max-width: 365px) {
+  .intro__subtitle br { display: none; }
+  .intro__subtitle { max-width: 300px; text-wrap: balance; }
+}
+
+/* Tela de análise em telas muito baixas: anel e espaços menores para as 3 etapas caberem */
+@media (max-height: 600px) {
+  .intro__title { margin-top: 64px; }   /* capa: 155px na referência de 800px */
+  .intro__korea { margin-top: 36px; }
+  .analysis__title { margin-top: 36px; }
+  .analysis__ring { width: 128px; height: 128px; margin-top: 22px; }
+  .analysis__value { font-size: 40px; }
+  .analysis__stage { margin-top: 20px; }
+  .analysis__steps li { padding-top: 8px; }
+  .analysis__steps span { margin-top: 8px; }
+  .analysis__bottle { margin-top: 40px; }
 }
