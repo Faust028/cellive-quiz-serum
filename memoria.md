@@ -22,6 +22,8 @@ Histórico vivo de decisões e aprendizados. Registrar só o que ajuda na contin
 - **2026-10-05** — Sessão 9 é de múltipla escolha. O botão CONTINUAR exige pelo menos 1 seleção.
 - **2026-10-05** — Barra de progresso sempre crescente: 9, 14, 20 e 25% (Sessões 6 a 9). *Atualizada abaixo.*
 - **2026-10-19** — **Sessão 18: tela de análise pós-respostas**, a partir das 6 referências em `Analise pós respostas/`. Uma tela animada (6,5 s) com duas fases: análise com 3 etapas e, a partir de 75%, frasco enchendo. Comparada lado a lado nos 6 pontos das referências e testada no fluxo real (Sessão 17 → 18 → 100%). Ícones e frasco desenhados em SVG. *Atualizada abaixo.*
+- **2026-10-19** — **Correção para celular** (a usuária viu botões por cima das opções e opções sumindo): fotos de pergunta encolhem conforme a altura da tela; idade e dores compactas em telas ≤ 740 px; grades fluidas em ≤ 380 px de largura; opções quebram linha em ≤ 365 px; CONTINUAR sem sticky em ≤ 600 px. Auditoria automática (opção escondida, botão sobre card, texto cortado, fora da largura) passou em 360×640, 375×667, 390×664, 412×780, 412×915 e 370×800.
+- **2026-10-19** — **Repositório GitHub**: `github.com/Faust028/cellive-quiz-serum`, **público** por escolha da usuária, mesmo avisada de que a fonte Acumin e os documentos ficam visíveis. Branch `main`, primeiro commit `85d9058` (45 arquivos). Git 2.55 instalado via winget (`C:\Program Files\Git\cmd\git.exe`); autor dos commits `Faust028 <Faust028@users.noreply.github.com>`. O `.gitignore` deixa de fora `node_modules`, `Fontes/`, backups, referências, fotos soltas da raiz e a pasta `landing page serum facial/` (outro projeto encontrado dentro da pasta, a confirmar com a usuária).
 - **2026-10-19** — **Sessão 18 refeita com as referências v2** (substitui a anterior): duas fases em sequência. Na fase 1 o anel vai até 100% com as etapas (acendem em 0, 40 e 72%). Na fase 2 o anel e a lista somem e um frasco maior (85×278,5 px, logo abaixo do título) enche de 0 a 100%. Tempos: 4 s + pausa de 0,6 s + 2,5 s. Comparada nos 6 pontos das referências e testada no fluxo real.
 - **2026-10-19** — **Sessão 7 (frequência de cuidados) removida** a pedido da usuária. As demais sessões mantêm o número (a 7 fica vaga) para continuar batendo com as referências e os documentos; o atalho `/#7` não abre mais nada. O quiz passou a ter 14 perguntas e a barra se recalculou sozinha (Sessão 6 entra em 21,4%).
 - **2026-10-19** — Stepper 1-2-3 (Sessões 2–4) com as cores da imagem enviada pela usuária: número do círculo ativo **branco** (antes `--slate`) e círculos concluídos em `#e0e0e0` (antes `#dddddd`). Os números futuros continuam `--slate`.
@@ -82,6 +84,7 @@ Histórico vivo de decisões e aprendizados. Registrar só o que ajuda na contin
 - **2026-10-12** — Liberar a quebra de linha em todas as opções fez "Queria ter uma pele radiante e viçosa." (Sessão 2) quebrar: o texto já era um pouco mais largo que o espaço. Solução: manter `nowrap` e usar `.option--2-linhas` só onde precisa.
 - **2026-10-12** — Scripts de captura na pasta temporária sumiram; o recriado (`render.ps1`) precisa achar "Sessão N.jpeg" por curinga, porque o PowerShell 5.1 lê o "ã" de arquivos UTF-8 sem BOM errado.
 - **2026-10-06** — Em telas baixas, o botão CONTINUAR ficava escondido atrás da bandeja fixa. Um primeiro `position: sticky` não funcionou porque `overflow-x: hidden` no `.app` criava um contêiner de rolagem.
+- **2026-10-19** — O `git push` pelo terminal do Claude falha ("terminal prompts disabled"), porque o login do GitHub precisa de janela. Solução: rodar o push no terminal da usuária (painel de terminal), onde o Git Credential Manager abre o navegador.
 - **2026-10-19** — Na primeira versão da barra automática, a Sessão 6 entrava em 0% quando a aba não estava visível: a animação dependia de `requestAnimationFrame`. Trocado por reflow forçado + transição, que funciona sempre.
 - **2026-10-16** — Interpretei mal "substituí o GHK-Cu e o Ácido Hialurônico" e troquei a imagem do Ácido Hialurônico, apagando o recorte antigo. Recriado a partir de `Sessões/Sessão 8.jpeg` (x 22, y 1458, 122×90). Lição: antes de trocar uma imagem, confirmar quais arquivos a usuária realmente mudou.
 - **2026-10-06** — Substituições em lote nos documentos via PowerShell corromperam `specs/design.md` e `memoria.md` (hífens e quebras de linha apagados). Causa: em PowerShell a vírgula tem precedência sobre `+`, e um array com um só par é "desembrulhado"; os pares viraram letras soltas.
@@ -97,7 +100,6 @@ Histórico vivo de decisões e aprendizados. Registrar só o que ajuda na contin
 
 ## Pendências
 
-- As Sessões 8, 12, 15 e 16 (foto + 3 opções) precisam de 719 px de tela; em celulares menores (ex.: iPhone SE) a última opção também fica atrás da bandeja. Avaliar aplicar `.step--compacta` nelas.
 - Bandeja com 8 ativos: só os 3–4 mais recentes aparecem; os mais antigos saem pela direita. Avaliar se está bom assim.
 - Pontos do PDF: perguntas 9 e 10 com o mesmo texto; duas perguntas "8"; "Nunca utilizei" sobrando na 11; "perdo" (perdi?) na segunda 8; "Propilenoglicol" é mais um veículo/umectante do que um ativo anti-idade, confirmar se deve aparecer como ativo.
 - Confirmar se a licença da Acumin Variable Concept permite hospedar a fonte no site. Se não permitir, usar um kit do Adobe Fonts antes de publicar.
@@ -106,7 +108,8 @@ Histórico vivo de decisões e aprendizados. Registrar só o que ajuda na contin
 - Informações do produto: nome, tipo, demais ativos, preço, kits, garantia, prazo e frete.
 - Confirmar as afirmações das telas (ver tabela em `specs/site.md`): "+1.000 mulheres", "10 perguntas · 2 minutos", "Entrega Grátis", "tecnologia coreana", "100%" (antes "88%"), "99 de 100", foto antes/depois.
 - Texto e destino da CTA final e plataforma de checkout.
-- Publicar na Vercel e criar o CNAME `quiz` no Registro.br (passo a passo dado à usuária em 2026-10-17).
+- Importar o repositório do GitHub na Vercel e criar o CNAME `quiz` no Registro.br.
+- Decidir o que é a pasta `landing page serum facial/` (página de venda?) e se entra neste repositório.
 - Ferramentas de rastreamento (Meta Pixel, GA etc.).
 - Link real da Política de Privacidade (hoje `href="#"`).
 - Implementar `prefers-reduced-motion` e `loading="lazy"` nas imagens fora da primeira tela.

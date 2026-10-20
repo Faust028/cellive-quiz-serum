@@ -167,6 +167,15 @@ Referências v2 (atualizadas pela usuária em 2026-10-19): `Analise pós respost
 ### Foto antes/depois (Sessão 5)
 Imagem de 280×175 px com cantos de 24 px.
 
+## Ajustes para celular (2026-10-19)
+
+Em telas como a das referências (≥ 760 px de altura, 370–430 px de largura) **nada muda**. Em telas menores o layout se adapta para nenhuma opção ficar atrás da bandeja e nenhum botão ficar por cima das opções:
+- **Perguntas com foto** (8, 11, 12, 15, 16, 17): a sessão tem exatamente a altura da tela (`100svh`) e a **foto encolhe** (`flex: 0 1 200px`, mínimo 100 px) para as opções caberem. Em 360×640 as fotos ficam com ~164 px; em 375×667, com ~191 px.
+- **Altura ≤ 740 px**: menos espaço acima do título (30 px) e entre as opções (13 px); idade com cards de 172 px (foto 118×120); dores com cards de 112 px (foto 80×78) e CONTINUAR 18 px abaixo da grade.
+- **Altura ≤ 600 px** (iPhone SE antigo): cards ainda menores, e o CONTINUAR deixa de ser sticky (fica no fluxo, com um pouco de rolagem) para não cobrir os cards.
+- **Largura ≤ 380 px**: as grades da idade e das dores se ajustam à largura (colunas `minmax`); **≤ 365 px**: opções com texto longo quebram em 2 linhas.
+- Conferido sem problemas em 360×640, 375×667, 390×664, 412×780, 412×915 e 370×800. Em 320×568 precisa rolar ~10–20 px nas Sessões 9 e 17.
+
 ## Estados e interações
 
 - **Selecionado** (opções e cards): fundo `#f5f8fc`, anel de 2 px `--blue` e sombra maior. Radio preenchido de azul com ponto branco de 7 px.

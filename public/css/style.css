@@ -794,3 +794,79 @@ html, body {
 .analysis__bottle-empty { fill: #dadbe0; }
 .analysis__bottle-fill { fill: #1b1b1b; }
 
+
+/* =========================================================
+   AJUSTES PARA CELULAR (2026-10-19)
+   Em telas como a das referências (≥ 760 px de altura) nada muda.
+   Em telas menores o conteúdo se adapta para caber acima da bandeja.
+   ========================================================= */
+
+/* Perguntas com foto: a tela tem a altura do celular e a FOTO encolhe
+   (de 200 px até 100 px) para as opções sempre caberem acima da bandeja. */
+.step:has(> .question__photo) {
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+}
+.step[data-tray]:has(> .question__photo) { padding-bottom: calc(var(--tray-height) + 10px); }
+.step:has(> .question__photo) > * { flex-shrink: 0; }
+.step:has(> .question__photo) > .question__photo {
+  flex: 0 1 200px;
+  height: auto;
+  min-height: 100px;
+}
+.step--compacta:has(> .question__photo) > .question__photo { flex-basis: 130px; }
+
+/* Telas baixas: menos espaço acima do título e entre as opções */
+@media (max-height: 740px) {
+  .question__title--photo { margin-top: 30px; }
+  .options--after-photo { margin-top: 16px; gap: 13px; }
+  .step--compacta .question__title--photo { margin-top: 20px; }
+  .step--compacta .options--after-photo { gap: 10px; }
+
+  /* Idade (Sessão 6): cards e fotos menores */
+  .age__title { margin-top: 36px; }
+  .age__grid { gap: 14px; }
+  .age-card { height: 172px; padding-top: 9px; }
+  .age-card img { width: 118px; height: 120px; }
+  .age-card span { margin-top: 11px; }
+
+  /* Dores (Sessão 9): cards menores e CONTINUAR mais perto, sem cobrir os cards */
+  .question__title--photo + .pains__subtitle { margin-top: 2px; }
+  .step--pains .question__title--photo { margin-top: 26px; }
+  .pains__grid { row-gap: 10px; margin-top: 12px; }
+  .pain-card { height: 112px; padding-top: 6px; }
+  .pain-card img { width: 80px; height: 78px; }
+  .pain-card span { margin-top: 7px; }
+  .btn-continue { margin-top: 18px; }
+}
+
+/* Telas estreitas (≤ 365 px): texto longo das opções quebra em 2 linhas em vez de ser cortado */
+@media (max-width: 365px) {
+  .option { white-space: normal; padding-right: 16px; }
+}
+/* Telas estreitas (≤ 380 px): grades da idade e das dores se ajustam à largura */
+@media (max-width: 380px) {
+  .age__grid { width: 100%; grid-template-columns: repeat(2, minmax(0, 160.5px)); justify-content: center; }
+  .age-card { padding-left: 10px; padding-right: 10px; }
+  .age-card img { max-width: 100%; }
+  .pains__grid { width: 100%; grid-template-columns: repeat(3, minmax(0, 109px)); justify-content: center; column-gap: 8px; }
+  .pain-card img { max-width: calc(100% - 10px); }
+  .pain-card span { font-size: 10px; }
+}
+
+/* Telas muito baixas (≤ 600 px, ex.: iPhone SE antigo) */
+@media (max-height: 600px) {
+  .age__title { margin-top: 22px; }
+  .age__subtitle { margin-top: 6px; }
+  .age-card { height: 150px; }
+  .age-card img { height: 100px; }
+  .step--pains .question__title--photo { margin-top: 16px; }
+  .pain-card { height: 98px; }
+  .pain-card img { height: 66px; }
+  /* sem espaço para tudo: o botão volta ao fluxo normal (abaixo dos cards, com rolagem)
+     em vez de flutuar por cima deles */
+  .btn-continue { position: static; margin-top: 12px; height: 46px; }
+  .step--compacta .question__title--photo { margin-top: 12px; }
+  .step--compacta .options--after-photo { margin-top: 10px; gap: 8px; }
+}
