@@ -805,11 +805,11 @@ html, body {
 
 .analysis__bottle {
   width: 85px;              /* referência v2: 1,23× o desenho original */
-  height: 278.5px;
+  height: 276px;             /* 85 × 224,25 ÷ 69 (proporção do frasco novo) */
   margin-top: 83.5px;       /* topo do frasco a 268 px do topo da tela */
 }
-.analysis__bottle-empty { fill: #dadbe0; }
-.analysis__bottle-fill { fill: #1b1b1b; }
+.analysis__bottle-empty { fill: #dbdce1; }
+.analysis__bottle-fill { fill: #1c1c1c; }
 
 
 /* =========================================================

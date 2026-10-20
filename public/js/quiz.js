@@ -127,7 +127,8 @@
 
     step.classList.toggle('is-phase-2', v > 100);
     const fill = Math.min(Math.max((v - 100) / 100, 0), 1);
-    step.querySelector('.analysis__bottle-fill').setAttribute('y', 226 * (1 - fill));
+    const bottleH = step.querySelector('.analysis__bottle').viewBox.baseVal.height;   // altura do desenho do frasco
+    step.querySelector('.analysis__bottle-fill').setAttribute('y', bottleH * (1 - fill));
   }
 
   // Fase 1 em data-analysis ms, pausa de 0,6 s em 100%, fase 2 em data-fill ms,
