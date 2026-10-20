@@ -67,6 +67,42 @@
     setProgress(step, pct(answeredBefore(step) + 1));
   }
 
+  // ---------- Número dentro do anel (Sessões 5 e 18) ----------
+  // O "100%" tem que caber no miolo do anel em qualquer fonte e tamanho de tela.
+  // Mede a largura real do texto e, se passar de 66% do miolo, reduz a fonte (dá folga ao "100%").
+  // Só recalcula quando muda a quantidade de dígitos (ex.: 9 → 10 → 100).
+  const RING_TEXT_MAX = .66;
+  function fitRingValue(counter) {
+    const value = counter.parentElement;               // .analysis__value / .result__value
+    const ring = value.parentElement;                  // .analysis__ring / .result__ring
+    const key = `${counter.textContent.length}|${ring.clientWidth}`;
+    if (value.dataset.fit === key) return;
+    value.dataset.fit = key;
+    value.style.fontSize = '';
+    const svg = ring.querySelector('svg');
+    const circle = ring.querySelector('circle');
+    const scale = ring.clientWidth / svg.viewBox.baseVal.width;
+    const stroke = parseFloat(getComputedStyle(circle).strokeWidth) * scale;
+    const inner = ring.clientWidth - 2 * stroke;
+    const range = document.createRange();
+    range.selectNodeContents(value);
+    const width = range.getBoundingClientRect().width;
+    if (!width || !inner) return;
+    const limit = inner * RING_TEXT_MAX;
+    if (width > limit) {
+      const base = parseFloat(getComputedStyle(value).fontSize);
+      value.style.fontSize = `${Math.floor(base * (limit / width) * 10) / 10}px`;
+    }
+  }
+  // Quando a fonte Acumin termina de carregar (ou a tela muda de tamanho), mede de novo
+  const refitRings = () => document.querySelectorAll('.analysis__value, .result__value').forEach((v) => {
+    delete v.dataset.fit;
+    const c = v.querySelector('[data-count]');
+    if (c && v.offsetParent) fitRingValue(c);
+  });
+  if (document.fonts) document.fonts.ready.then(refitRings);
+  window.addEventListener('resize', refitRings);
+
   // ---------- Tela de análise (Sessão 18) ----------
   // Escala única v de 0 a 200:
   //  - v 0–100   = fase 1: anel e número de 0 a 100%; etapas acendem em data-at (0, 40, 72);
@@ -77,7 +113,9 @@
     const length = 2 * Math.PI * circle.r.baseVal.value;
     circle.style.strokeDasharray = length;
     circle.style.strokeDashoffset = length * (1 - ring / 100);
-    step.querySelector('[data-count]').textContent = Math.round(ring);
+    const counter = step.querySelector('[data-count]');
+    counter.textContent = Math.round(ring);
+    fitRingValue(counter);
     step.querySelector('.analysis__ring').setAttribute('aria-valuenow', Math.round(ring));
 
     const items = [...step.querySelectorAll('.analysis__steps li')];
@@ -95,18 +133,47 @@
   // Fase 1 em data-analysis ms, pausa de 0,6 s em 100%, fase 2 em data-fill ms,
   // pausa de 0,9 s com o frasco cheio e segue para a próxima sessão (se houver)
   const PAUSE_BETWEEN = 600;
+
+  // Staggered Progress com pausas dramáticas: cada fase é dividida em trechos
+  // [alvo na escala 0–200, fração do tempo da fase]. Alvo repetido = pausa.
+  // As frações de cada fase somam 1, então o tempo total não muda.
+  // As pausas da fase 1 começam exatamente quando as etapas acendem (40 e 72).
+  const PHASE_1 = [[40, .275], [40, .0875], [72, .25], [72, .1125], [94, .1625], [94, .0625], [100, .05]];
+  const PHASE_2 = [[135, .28], [135, .10], [178, .30], [178, .12], [200, .20]];
+  const easeInOut = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+
+  // Monta a linha do tempo: [{ de, para, início (ms), duração (ms) }, ...]
+  function buildTimeline(t1, t2) {
+    const segs = [];
+    let at = 0;
+    let v = 0;
+    const add = (phase, total) => phase.forEach(([to, frac]) => {
+      const dur = frac * total;
+      segs.push({ from: v, to, at, dur });
+      at += dur;
+      v = to;
+    });
+    add(PHASE_1, t1);
+    segs.push({ from: 100, to: 100, at, dur: PAUSE_BETWEEN });   // pausa em 100% antes do frasco
+    at += PAUSE_BETWEEN;
+    add(PHASE_2, t2);
+    return { segs, total: at };
+  }
+
+  function valueAt(timeline, t) {
+    const seg = timeline.segs.find((s) => t < s.at + s.dur) || timeline.segs[timeline.segs.length - 1];
+    const x = Math.min(Math.max((t - seg.at) / seg.dur, 0), 1);
+    return seg.from + (seg.to - seg.from) * easeInOut(x);
+  }
+
   function runAnalysis(step) {
-    const t1 = Number(step.dataset.analysis);
-    const t2 = Number(step.dataset.fill);
+    const timeline = buildTimeline(Number(step.dataset.analysis), Number(step.dataset.fill));
     const start = performance.now();
     setAnalysis(step, 0);
     const tick = () => {
       if (!step.classList.contains('is-active')) return;
       const t = performance.now() - start;
-      let v;
-      if (t < t1) v = (t / t1) * 100;
-      else if (t < t1 + PAUSE_BETWEEN) v = 100;
-      else v = 100 + Math.min((t - t1 - PAUSE_BETWEEN) / t2, 1) * 100;
+      const v = t >= timeline.total ? 200 : valueAt(timeline, t);
       setAnalysis(step, v);
       if (v < 200) setTimeout(tick, 30);
       else autoTimer = setTimeout(() => goTo(current + 1), 900);
@@ -196,6 +263,7 @@
       const value = target * eased;
       progress.style.strokeDashoffset = length * (1 - value / 100);
       counter.textContent = Math.round(value);
+      fitRingValue(counter);
       if (t < 1) requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
