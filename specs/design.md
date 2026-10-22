@@ -119,13 +119,14 @@ Pílula de 250×51 px, fundo `--blue`, texto branco condensado de 24 px, brilho 
 - Subtítulo: 14,3 / 17,5 px, `#a8a8a8`.
 
 ### Botão CONTINUAR (Sessão 9)
-- Pílula de 153×50,5 px, 38 px abaixo da grade. Mesmo estilo do CTA da capa, com texto condensado de 22,7 px em maiúsculas.
+- Pílula de 153×50,5 px, 38 px abaixo da grade, no formato do CTA da capa, com texto condensado de 22,7 px em maiúsculas.
+- **Cores (desde 2026-10-22, imagem enviada pela usuária):** fundo preto `#1a1a1a`, texto branco, sem brilho. Antes era azul `--blue` com brilho, igual ao CTA da capa. O CTA da capa continua azul.
 - **Sempre visível, sem nunca ficar por cima de um card** (desde 2026-10-22): o botão fica dentro de uma **faixa branca** (`.continue-bar`, com degradê de 12 px no topo) que é `position: sticky` com `bottom: var(--tray-height)`. O botão fica 16 px acima do rodapé (10 px em telas ≤ 740 px). `--tray-height` é a altura do rodapé de ativos (107 / 86 / 76 px conforme a altura da tela).
   - Em telas altas (800 px, como a referência), fica no lugar original (38 px abaixo da grade).
   - Em telas baixas, a faixa gruda logo acima do rodapé e os cards **passam por baixo dela** ao rolar, como passam por baixo do rodapé. Antes, só o botão grudava e ele aparecia flutuando por cima das fotos dos cards.
   - Em telas ≤ 600 px de altura, a faixa fica no fluxo normal, logo abaixo dos cards.
   - Para isso funcionar, o `.app` usa `overflow-x: clip`. Não usar `hidden`: ele cria um contêiner de rolagem e quebra o sticky.
-- Desativado: fundo sólido `#dbe5f0`, sem brilho. Não usar opacidade, porque o botão pode ficar por cima das fotos.
+- Desativado (nenhuma dor marcada): fundo cinza sólido `#c4c4c6` com texto branco (a imagem não mostrava esse estado; antes era `#dbe5f0`). Não usar opacidade.
 
 ### Rodapé de ativos (Sessão 6 em diante) — layout de 2026-10-22
 Referência: imagem enviada pela usuária em 2026-10-22 (Sessão 6 com o rodapé novo). **Substitui a bandeja anterior** (fila de ativos lado a lado com FLIP).

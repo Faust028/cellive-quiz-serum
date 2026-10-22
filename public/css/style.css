@@ -618,7 +618,8 @@ html, body {
   background: linear-gradient(rgba(255, 255, 255, 0), #fff 12px);
 }
 
-/* Botão CONTINUAR (mesmo estilo do CTA da capa) */
+/* Botão CONTINUAR (formato do CTA da capa; cores da imagem enviada pela usuária em 2026-10-22:
+   preto #1a1a1a com texto branco, sem brilho) */
 .btn-continue {
   flex: none;
   min-width: 153px;
@@ -627,22 +628,19 @@ html, body {
   padding: 4px 26px 2px;
   border: 0;
   border-radius: 999px;
-  background: var(--blue);
-  box-shadow: 0 0 10px 2px var(--blue-glow);
+  background: #1a1a1a;
   color: var(--white);
   font-family: var(--font-cond);
   font-weight: 600;
   font-size: 22.7px;
   letter-spacing: .01em;
   cursor: pointer;
-  transition: opacity .25s ease, box-shadow .25s ease, transform .15s ease;
+  transition: background-color .25s ease, transform .15s ease;
 }
 .btn-continue:active { transform: scale(.97); }
 .btn-continue:disabled {
-  /* cor sólida (azul 45% sobre branco) em vez de opacidade: o botão pode ficar
-     por cima das fotos quando gruda acima da bandeja, e não pode ficar transparente */
-  background: #dbe5f0;
-  box-shadow: none;
+  /* cinza sólido enquanto nenhuma dor foi marcada (sem opacidade: o botão fica sobre a faixa branca) */
+  background: #c4c4c6;
   cursor: default;
 }
 
