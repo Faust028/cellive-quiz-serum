@@ -269,12 +269,14 @@
     fitPills();
   }
 
-  // Pílula cinza (anterior): se uma palavra do nome não cabe inteira, mostra só a imagem
+  // Pílulas cinza (anteriores): se uma palavra do nome não cabe inteira, mostram só a imagem.
+  // Confere da mais antiga para a mais nova: cada uma que vira só imagem libera espaço para as outras.
   function fitPills() {
-    traySlot.querySelectorAll('.ativo--pilula').forEach((p) => {
-      p.classList.remove('is-compacta');
+    const grays = [...traySlot.querySelectorAll('.ativo--pilula.is-prev')].reverse();
+    grays.forEach((p) => p.classList.remove('is-compacta'));
+    grays.forEach((p) => {
       const span = p.querySelector('span');
-      if (p.classList.contains('is-prev') && span && span.scrollWidth > span.clientWidth + 0.5) p.classList.add('is-compacta');
+      if (span && span.scrollWidth > span.clientWidth + 0.5) p.classList.add('is-compacta');
     });
   }
   window.addEventListener('resize', fitPills);
@@ -324,18 +326,23 @@
     if (!animate) renderTray();
   }
 
-  // Versão de teste (pílulas): o ativo novo chega em uma pílula com borda azul; o anterior fica
-  // cinza ao lado dele por um instante e logo entra no frasco (como na versão original: a cada
-  // resposta, o ativo anterior entra no produto). Na última pergunta, o último também entra: frasco cheio.
+  // Versão de teste (pílulas): o rodapé junta até TRAY_MAX ativos. O mais novo chega em uma pílula
+  // com borda azul à esquerda e os anteriores ficam cinza à direita. Quando chega um a mais, o mais
+  // antigo entra no frasco e o preto sobe. Na última pergunta, os que sobraram entram um a um: frasco cheio.
   // Retorna quanto tempo a animação leva (0 se nada mudou). Regra: um ativo por pergunta.
-  const GRAY_HOLD = 220;   // tempo que o anterior fica cinza ao lado do novo antes de entrar no frasco
+  const TRAY_MAX = 3;       // quantos ativos ficam juntos no rodapé antes de o mais antigo ir para o frasco
+  const SLIDE = 260;        // os anteriores deslizando para a direita
+  const POUR_GAP = 150;     // intervalo entre um ativo e outro entrando no frasco (última pergunta)
   function addAtivo(id, animate = true, origin = null) {
     const novo = (id || '').split(/\s+/).filter(Boolean).find((x) => !collected.includes(x));
     const tpl = novo && document.getElementById(`ativo-${novo}`);
     if (!tpl) return 0;
-    const prev = traySlot.firstElementChild;
-    const prevFrom = prev && animate ? prev.getBoundingClientRect() : null;
-    if (prev) prev.classList.add('is-prev');
+    // Rodapé cheio: o mais antigo começa a entrar no frasco no momento em que o novo chega
+    const leaving = traySlot.children.length >= TRAY_MAX ? traySlot.lastElementChild : null;
+    if (leaving) pourItem(leaving, animate);
+    const olds = [...traySlot.children];
+    const fromRects = animate ? olds.map((el) => el.getBoundingClientRect()) : [];
+    olds.forEach((el) => el.classList.add('is-prev'));
     collected.push(novo);
     const item = tpl.content.firstElementChild.cloneNode(true);
     item.classList.add('ativo--pilula');
@@ -343,22 +350,26 @@
     item.dataset.ativo = novo;
     traySlot.prepend(item);
     const last = collected.length === TOTAL_ATIVOS;
+    // Na última pergunta, todos que estão no rodapé entram no frasco, do mais antigo ao mais novo
+    const pourAll = (anim) => {
+      const rest = [...traySlot.children].reverse();
+      if (!anim) { rest.forEach((el) => pourItem(el, false)); return; }
+      rest.forEach((el, i) => setTimeout(() => pourItem(el, true), i * POUR_GAP));
+    };
     if (!animate) {
-      pourItem(prev, false);
-      if (last) pourItem(item, false);
+      if (last) pourAll(false);
       renderTray();
       return 0;
     }
     renderTray();
-    // O anterior desliza para a direita (FLIP), fica cinza e logo entra no frasco
-    if (prev) {
-      const to = prev.getBoundingClientRect();
-      prev.animate(
-        [{ transform: `translate(${prevFrom.left - to.left}px, ${prevFrom.top - to.top}px)` }, { transform: 'none' }],
-        { duration: GRAY_HOLD, easing: EASE }
+    // Os anteriores deslizam para a direita (FLIP), abrindo espaço para o novo
+    olds.forEach((el, i) => {
+      const to = el.getBoundingClientRect();
+      el.animate(
+        [{ transform: `translate(${fromRects[i].left - to.left}px, ${fromRects[i].top - to.top}px)` }, { transform: 'none' }],
+        { duration: SLIDE, easing: EASE }
       );
-      setTimeout(() => pourItem(prev, true), GRAY_HOLD);
-    }
+    });
     item.style.visibility = 'hidden';
     const to = item.getBoundingClientRect();
     const from = (origin || item).getBoundingClientRect();
@@ -373,13 +384,14 @@
       ],
       { duration: FLY, easing: EASE, fill: 'forwards' }
     );
-    const pourEnd = prev ? GRAY_HOLD + POUR : 0;
+    const lastWait = 120;
+    const remaining = olds.length + 1;
     whenDone(anim, FLY, () => {
       item.style.visibility = '';
       fl.remove();
-      if (last) setTimeout(() => pourItem(item, true), Math.max(120, pourEnd - FLY + 60));   // último também entra: frasco cheio
+      if (last) setTimeout(() => pourAll(true), lastWait);
     });
-    return last ? Math.max(FLY + 120, pourEnd + 60) + POUR : Math.max(FLY, pourEnd);
+    return last ? FLY + lastWait + (remaining - 1) * POUR_GAP + POUR : FLY;
   }
 
   // ---------- Anel de porcentagem (Sessão 5) ----------

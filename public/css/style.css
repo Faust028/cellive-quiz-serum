@@ -744,7 +744,7 @@ html, body {
 
 /* Versão de teste (pílulas, imagem enviada pela usuária em 2026-10-22): o ativo novo e o anterior
    ficam lado a lado em pílulas, à esquerda, logo depois do frasquinho */
-.tray__slot { justify-content: flex-start; gap: 10px; padding-left: 28px; }
+.tray__slot { justify-content: flex-start; gap: 8px; padding-left: 28px; }
 .ativo.ativo--pilula {
   flex: 0 1 auto;
   min-width: 0;
@@ -756,8 +756,8 @@ html, body {
   box-shadow: inset 0 0 0 1.5px var(--blue);    /* o mais novo: borda azul */
   transition: box-shadow .3s ease;
 }
-.ativo.ativo--pilula:not(.is-prev) { flex: none; }   /* o novo mostra o nome inteiro */
-.ativo.ativo--pilula.is-prev { box-shadow: none; }   /* o anterior: pílula cinza, encolhe se faltar espaço */
+.ativo.ativo--pilula:not(.is-prev) { min-width: auto; }   /* o novo só quebra o nome entre palavras */
+.ativo.ativo--pilula.is-prev { flex-shrink: 20; box-shadow: none; }   /* o anterior: pílula cinza, encolhe se faltar espaço */
 .ativo.ativo--pilula img {
   flex: none;
   width: 34px;
@@ -769,7 +769,13 @@ html, body {
 }
 .ativo.ativo--pilula.is-prev img { opacity: .5; filter: grayscale(1); }
 /* sem espaço para o nome sem cortar palavra (o quiz.js marca .is-compacta): a pílula cinza mostra só a imagem */
-.ativo.ativo--pilula.is-compacta { padding-right: 5px; }
+.ativo.ativo--pilula.is-compacta { flex-shrink: 0; padding: 4px; min-height: 40px; }
+.ativo.ativo--pilula.is-compacta img { width: 32px; height: 32px; }
+@media (max-width: 345px) {   /* telas estreitas: espaços menores para 3 pílulas caberem */
+  .tray__slot { gap: 5px; padding-left: 22px; }
+  .ativo.ativo--pilula { padding-right: 12px; }
+  .ativo.ativo--pilula.is-compacta { padding-right: 4px; }
+}
 .ativo.ativo--pilula.is-compacta span { display: none; }
 .ativo.ativo--pilula span {
   min-width: 0;
