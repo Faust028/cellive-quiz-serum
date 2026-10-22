@@ -66,7 +66,7 @@ html, body {
   align-items: center;
   min-height: 100vh;
   min-height: 100svh;
-  padding: 0 16px;
+  padding: 0 16px 24px;   /* folga embaixo: a última opção nunca encosta na borda da tela ao rolar */
 }
 .step.is-active { display: flex; animation: stepIn .35s ease both; }
 
@@ -602,15 +602,25 @@ html, body {
   box-shadow: 0 3px 14px rgba(0, 0, 0, .1), 0 0 0 2px var(--blue);
 }
 
-/* Botão CONTINUAR (mesmo estilo do CTA da capa) */
-.btn-continue {
-  /* Fica no lugar da referência; em telas baixas "gruda" logo acima da bandeja
-     de ativos (título 26px + painel 83px + 16px de folga) e nunca some atrás dela */
+/* Faixa do CONTINUAR (Sessão 9). Fica no lugar da referência (botão 38 px abaixo da grade);
+   em telas baixas gruda logo acima do rodapé de ativos. Ela é branca (com um degradê em cima),
+   então os cards passam POR BAIXO dela ao rolar: o botão nunca fica por cima de um card. */
+.continue-bar {
   position: sticky;
-  bottom: calc(var(--tray-height) + 16px);
+  bottom: var(--tray-height);
   z-index: 5;
   flex: none;
-  margin-top: 38px;
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+  padding: 12px 0 16px;
+  background: linear-gradient(rgba(255, 255, 255, 0), #fff 12px);
+}
+
+/* Botão CONTINUAR (mesmo estilo do CTA da capa) */
+.btn-continue {
+  flex: none;
   min-width: 153px;
   max-width: 100%;
   min-height: 50.5px;
@@ -968,7 +978,9 @@ html, body {
 .step:has(> .question__photo) {
   height: 100vh;
   height: 100svh;
-  min-height: 0;
+  /* se nem com a foto no mínimo tudo couber (texto ampliado, tela deitada), a sessão
+     cresce e rola em vez de deixar opção presa atrás do rodapé */
+  min-height: min-content;
 }
 .step[data-tray]:has(> .question__photo) { padding-bottom: calc(var(--tray-height) + 10px); }
 .step:has(> .question__photo) > * { flex-shrink: 0; }
@@ -1000,7 +1012,7 @@ html, body {
   .pain-card { min-height: 108px; padding-top: 6px; }
   .pain-card img { width: 80px; height: 74px; }
   .pain-card span { margin-top: 7px; }
-  .btn-continue { margin-top: 18px; bottom: calc(var(--tray-height) + 10px); }
+  .continue-bar { margin-top: 6px; padding-bottom: 10px; }
 }
 
 /* Telas estreitas (≤ 365 px): texto longo das opções quebra em 2 linhas em vez de ser cortado */
@@ -1026,7 +1038,8 @@ html, body {
   .pain-card img { height: 66px; }
   /* sem espaço para tudo: o botão volta ao fluxo normal (abaixo dos cards, com rolagem)
      em vez de flutuar por cima deles */
-  .btn-continue { position: static; margin-top: 12px; min-height: 46px; }
+  .continue-bar { position: static; margin-top: 0; padding: 12px 0 0; background: none; }
+  .btn-continue { min-height: 46px; }
   .step--compacta .question__title--photo { margin-top: 12px; }
   .step--compacta .options--after-photo { margin-top: 10px; gap: 8px; }
 

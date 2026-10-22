@@ -120,9 +120,10 @@ Pílula de 250×51 px, fundo `--blue`, texto branco condensado de 24 px, brilho 
 
 ### Botão CONTINUAR (Sessão 9)
 - Pílula de 153×50,5 px, 38 px abaixo da grade. Mesmo estilo do CTA da capa, com texto condensado de 22,7 px em maiúsculas.
-- **Sempre visível:** `position: sticky` com `bottom: calc(var(--tray-height) + 16px)` (10 px em telas ≤ 740 px), onde `--tray-height` é a altura do rodapé de ativos (107 / 86 / 76 px conforme a altura da tela).
-  - Em telas altas (800 px, como a referência), fica no lugar original.
-  - Em telas baixas, gruda logo acima do rodapé de ativos, sem cobrir os cards.
+- **Sempre visível, sem nunca ficar por cima de um card** (desde 2026-10-22): o botão fica dentro de uma **faixa branca** (`.continue-bar`, com degradê de 12 px no topo) que é `position: sticky` com `bottom: var(--tray-height)`. O botão fica 16 px acima do rodapé (10 px em telas ≤ 740 px). `--tray-height` é a altura do rodapé de ativos (107 / 86 / 76 px conforme a altura da tela).
+  - Em telas altas (800 px, como a referência), fica no lugar original (38 px abaixo da grade).
+  - Em telas baixas, a faixa gruda logo acima do rodapé e os cards **passam por baixo dela** ao rolar, como passam por baixo do rodapé. Antes, só o botão grudava e ele aparecia flutuando por cima das fotos dos cards.
+  - Em telas ≤ 600 px de altura, a faixa fica no fluxo normal, logo abaixo dos cards.
   - Para isso funcionar, o `.app` usa `overflow-x: clip`. Não usar `hidden`: ele cria um contêiner de rolagem e quebra o sticky.
 - Desativado: fundo sólido `#dbe5f0`, sem brilho. Não usar opacidade, porque o botão pode ficar por cima das fotos.
 
@@ -195,6 +196,11 @@ Em telas como a das referências (≥ 760 px de altura, 370–430 px de largura)
 - **Altura ≤ 600 px** também compacta: logo a 26 px do topo, barra 14 px abaixo, opções com 44 px de altura mínima (área de toque) e 10 px entre elas, fotos de pergunta até 80 px, capa com o título a 64 px, tela de análise com anel de 128 px.
 - **Largura ≤ 365 px**: o `<br>` do subtítulo da capa some e a frase se distribui sozinha (antes sobrava "com" sozinho numa linha).
 - **Auditoria automática** (texto fora de botão/opção/card, elemento fora da largura, clicável escondido atrás da bandeja, toque < 44 px, clicáveis sobrepostos) em todas as sessões, inclusive as duas fases da análise, em 3 condições — fonte normal, fonte reserva Arial (fonte ainda não carregada) e texto 15% maior (zoom/"texto grande" do celular): **tudo ok** em 320×568, 360×640, 360×740, 370×800, 375×667, 390×664, 390×844, 430×932, 768×1024, 1024×768, 1366×657 e 1920×969. Única exceção: 320×568 com texto 15% maior, onde a última opção da S17 fica 3 px sob a bandeja (resolve com rolagem).
+- **Auditoria de 2026-10-22** (mais rigorosa: percorre a rolagem inteira de cada sessão e confere, em cada posição, se algum botão fica por cima de alguma opção e se toda opção aparece inteira acima do rodapé em algum momento). Ela achou e corrigiu três problemas:
+  - O CONTINUAR flutuava por cima dos cards de dor. Agora fica na faixa branca descrita acima.
+  - Com texto ampliado, a última opção da S17 nunca saía de trás do rodapé, porque as sessões com foto tinham altura fixa. Agora usam `min-height: min-content`: se nem com a foto no mínimo tudo couber, a sessão cresce e rola.
+  - Sem rodapé, a última opção encostava na borda de baixo. Agora toda sessão tem 24 px de folga embaixo.
+  - Resultado: **tudo ok** em 17 tamanhos × 3 condições (fonte normal, Arial, texto 15% maior), incluindo celular deitado e telas muito baixas: 320×480, 320×568, 360×640, 360×740, 375×667, 390×664, 370×800, 412×915, 430×932, 568×320, 667×375, 844×390, 768×1024, 1024×768, 1280×720, 1366×657 e 1920×969.
 - Em telas largas (tablet, notebook, computador), o quiz continua como uma coluna de até 430 px centralizada, com a bandeja da mesma largura.
 
 ## Estados e interações
