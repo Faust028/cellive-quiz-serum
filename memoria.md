@@ -74,7 +74,8 @@ Histórico vivo de decisões e aprendizados. Registrar só o que ajuda na contin
   - "25- 30" e "30- 35" → "25 - 30" e "30 - 35" (Sessão 6);
   - espaço duplo removido em "frequência  você" (Sessão 7);
   - "de deixa" → "te deixa" (Sessão 8);
-  - "mais de trazem" → "mais te trazem" e "contiuar" → "continuar" (Sessão 9).
+  - "mais de trazem" → "mais te trazem" e "contiuar" → "continuar" (Sessão 9);
+  - "tecnologia coreanos" → "tecnologia coreana" (Sessão 1, 2026-10-22, a pedido da usuária).
 - Acumin aplicada (`AcuminVariable-Latin.woff2`, 413 KB). Inter e Barlow Condensed removidas do Google Fonts (fica só a Montserrat do logo). Tamanhos e posições de todas as 7 sessões reajustados e conferidos lado a lado.
 - Servidor com `Cache-Control: no-store` para o navegador sempre carregar a versão mais recente.
 - **2026-10-05** — Sessões 8 e 9 construídas, bandeja de ativos adicionada às Sessões 7–9; tudo conferido lado a lado. O atalho `/#N` já entra com os ativos das sessões anteriores na bandeja.
