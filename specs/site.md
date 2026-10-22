@@ -91,13 +91,11 @@ As Sessões 11–17 não têm imagem de referência própria: seguem o layout da
 - Navegação entre sessões sem recarregar a página.
 - Avanço automático ao escolher uma opção (≈0,45 s depois, para mostrar a seleção).
 - Sessões sem botão avançam sozinhas pelo atributo `data-auto-next` (Sessão 5: 3,5 s).
-- **Bandeja de ativos** ("Combinação ideal para sua pele:"), fixa no rodapé nas sessões com `data-tray` (6–17):
-  - cada sessão com `data-ativo` adiciona o seu ativo quando a visitante responde, com qualquer resposta; **um ativo por pergunta** (o código aceita mais de um separado por espaço, mas a regra do projeto é um só);
-  - os ativos se acumulam e não se repetem;
-  - a bandeja só aparece depois do primeiro ativo;
-  - o ativo novo entra deslizando da esquerda, fica na primeira posição e empurra os anteriores para a direita, sem trocas depois (detalhes em `specs/design.md`);
-  - quando um ativo novo entra, o avanço espera 1,4 s para que ela veja o ativo chegar.
-- **Múltipla escolha** (Sessão 9): cards com `data-toggle`. O botão CONTINUAR fica desativado até haver pelo menos 1 seleção. Ao clicar, adiciona o ativo da sessão e espera a animação (1,4 s) antes de avançar.
+- **Rodapé de ativos** ("Combinação ideal para sua pele:" + contador x/N + frasquinho), fixo nas sessões com `data-tray` (6, 8–17), **visível desde a idade** com 0/N e o texto "Responda para revelar o primeiro ativo" (layout de 2026-10-22):
+  - cada sessão com `data-ativo` adiciona o seu ativo quando a visitante responde, com qualquer resposta; **um ativo por pergunta**; N é contado sozinho (hoje 11);
+  - o ativo **voa da opção marcada até o rodapé**; o ativo anterior **entra no frasquinho** e o preto do frasco sobe; na última pergunta o frasco fica cheio (N/N);
+  - animação rápida: o quiz avança 0,85 s depois da resposta (1,2 s na última).
+- **Múltipla escolha** (Sessão 9): cards com `data-toggle`. O botão CONTINUAR fica desativado até haver pelo menos 1 seleção. Ao clicar, o ativo da sessão voa do último card marcado e o quiz avança depois da animação.
 - **Barra de progresso automática**: respondidas ÷ total de perguntas do quiz (14, desde a remoção da Sessão 7). Avança no momento da resposta e chega a 100% na última pergunta.
 - Respostas guardadas em memória (`window.cellive.answers`, chave = número da sessão; na múltipla escolha, uma lista).
 - Rota `POST /api/respostas` no servidor (por enquanto só registra no console; o quiz ainda não envia).

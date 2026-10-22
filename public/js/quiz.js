@@ -2,9 +2,8 @@
   const steps = [...document.querySelectorAll('.step')];
   const answers = {};
   const ADVANCE_DELAY = 450;        // tempo para mostrar a opção marcada antes de avançar
-  const ADVANCE_DELAY_ATIVO = 1400; // mais tempo quando um ativo entra na bandeja
+  const ADVANCE_DELAY_ATIVO = 850;  // tempo mínimo quando um ativo voa para o rodapé (animação rápida)
   const tray = document.querySelector('.tray');
-  const trayList = tray.querySelector('.tray__list');
   let current = 0;
   let locked = false;
   let autoTimer = null;
@@ -182,65 +181,116 @@
     setTimeout(tick, 30);
   }
 
-  // ---------- Bandeja de ativos ----------
-  // Aparece nas sessões com data-tray, desde que já exista algum ativo.
-  function updateTray() {
-    const show = steps[current].hasAttribute('data-tray') && trayList.children.length > 0;
-    tray.classList.toggle('is-visible', show);
-  }
-
-  const SLIDE_IN = 600;    // novo ativo entrando pela esquerda e empurrando os outros
+  // ---------- Rodapé de ativos (layout de 2026-10-22) ----------
+  // Aparece em toda sessão com data-tray (da idade em diante), já mostrando 0/N.
+  // Ao responder: o ativo voa da opção marcada até o rodapé; o ativo anterior "entra"
+  // no frasco e o preto do frasco sobe. O último ativo também entra: frasco cheio.
+  const traySlot = tray.querySelector('.tray__slot');
+  const trayBottle = tray.querySelector('.tray__bottle');
+  const trayFill = tray.querySelector('.tray__bottle-fill');
+  const trayCount = tray.querySelector('[data-tray-count]');
+  const TOTAL_ATIVOS = steps.reduce((n, s) => n + (s.dataset.ativo || '').split(/\s+/).filter(Boolean).length, 0);
+  tray.querySelector('[data-tray-total]').textContent = TOTAL_ATIVOS;
+  const collected = [];   // ativos recebidos, na ordem
+  let inBottle = 0;       // quantos já entraram no frasco
+  const FLY = 450;        // voo da opção até o rodapé
+  const POUR = 350;       // ativo anterior entrando no frasco
   const EASE = 'cubic-bezier(.4, 0, .2, 1)';
 
-  // Técnica FLIP: mede as posições, muda o DOM e anima cada item da posição antiga até a nova
-  function flip(mutate, duration) {
-    const before = new Map([...trayList.children].map((el) => [el, el.getBoundingClientRect().left]));
-    mutate();
-    before.forEach((left, el) => {
-      const dx = left - el.getBoundingClientRect().left;
-      if (dx) el.animate([{ transform: `translateX(${dx}px)` }, { transform: 'none' }], { duration, easing: EASE });
-    });
+  function updateTray() {
+    tray.classList.toggle('is-visible', steps[current].hasAttribute('data-tray'));
   }
 
-  // Adiciona o ativo (uma vez só). Retorna quanto tempo a animação leva (0 se não era novo).
-  // Animação: o novo entra pela esquerda, fica na primeira posição e empurra os
-  // anteriores para a direita. Ninguém troca de lugar depois.
-  // Vários ativos na mesma sessão (data-ativo="a b"): entram um depois do outro.
-  function addAtivo(id, animate = true) {
-    const ids = (id || '').split(/\s+/).filter(Boolean);
-    if (ids.length > 1) {
-      let total = 0;
-      ids.forEach((one, i) => {
-        if (!animate) { addOne(one, false); return; }
-        setTimeout(() => addOne(one), i * SLIDE_IN);
-        total = i * SLIDE_IN + SLIDE_IN;
+  function renderTray() {
+    trayCount.textContent = collected.length;
+    // 3% de preto na base mesmo vazio (como na referência); cheio = 0%
+    trayFill.style.transform = `translateY(${(1 - inBottle / TOTAL_ATIVOS) * 97}%)`;
+    tray.classList.toggle('has-ativo', collected.length > 0);   // o texto inicial só aparece antes do 1º ativo
+  }
+
+  // Executa fn uma única vez quando a animação termina — pelo evento ou, se ele não vier
+  // (aba em segundo plano, celular economizando bateria), pelo tempo da animação.
+  function whenDone(anim, ms, fn) {
+    let done = false;
+    const run = () => { if (done) return; done = true; fn(); };
+    anim.onfinish = run;
+    setTimeout(run, ms + 60);
+  }
+
+  // Cópia do ativo, presa à tela, para animar sem mexer no layout do rodapé
+  function makeFlyer(item, rect) {
+    const fl = item.cloneNode(true);
+    fl.classList.add('ativo--voando');
+    Object.assign(fl.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, visibility: '' });
+    document.body.appendChild(fl);
+    return fl;
+  }
+
+  // O ativo que está no rodapé encolhe e entra no frasco; ao chegar, o preto sobe
+  function pourCurrent(animate) {
+    const item = traySlot.firstElementChild;
+    if (!item) return;
+    inBottle++;
+    if (animate) {
+      const r = item.getBoundingClientRect();
+      const b = trayBottle.getBoundingClientRect();
+      const fl = makeFlyer(item, r);
+      const dx = b.left + b.width / 2 - (r.left + r.width / 2);
+      const dy = b.top + b.height * 0.4 - (r.top + r.height / 2);
+      const anim = fl.animate(
+        [{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(.12)`, opacity: 0.2 }],
+        { duration: POUR, easing: 'cubic-bezier(.55, 0, .8, .3)', fill: 'forwards' }
+      );
+      whenDone(anim, POUR, () => {
+        fl.remove();
+        trayBottle.classList.remove('is-receiving');
+        void trayBottle.getBoundingClientRect();   // reinicia a "engolida"
+        trayBottle.classList.add('is-receiving');
+        renderTray();
       });
-      return animate ? total : 0;
     }
-    return addOne(ids[0], animate);
+    item.remove();
+    if (!animate) renderTray();
   }
 
-  function addOne(id, animate = true) {
-    if (!id || trayList.querySelector(`[data-ativo="${id}"]`)) return 0;
-    const tpl = document.getElementById(`ativo-${id}`);
+  // Adiciona o ativo da pergunta. origin = elemento clicado (de onde o ativo sai voando).
+  // Retorna quanto tempo a animação leva (0 se nada mudou). Regra: um ativo por pergunta.
+  function addAtivo(id, animate = true, origin = null) {
+    const novo = (id || '').split(/\s+/).filter(Boolean).find((x) => !collected.includes(x));
+    const tpl = novo && document.getElementById(`ativo-${novo}`);
     if (!tpl) return 0;
+    pourCurrent(animate);
+    collected.push(novo);
     const item = tpl.content.firstElementChild.cloneNode(true);
-    item.dataset.ativo = id;
-
+    item.dataset.ativo = novo;
+    traySlot.appendChild(item);
+    const last = collected.length === TOTAL_ATIVOS;
     if (!animate) {
-      trayList.prepend(item);
-      updateTray();
+      if (last) pourCurrent(false);
+      renderTray();
       return 0;
     }
-
-    flip(() => trayList.prepend(item), SLIDE_IN);
-    updateTray();
-    const offscreen = -item.getBoundingClientRect().right - 20;
-    item.animate(
-      [{ transform: `translateX(${offscreen}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }],
-      { duration: SLIDE_IN, easing: EASE }
+    renderTray();
+    item.style.visibility = 'hidden';
+    const to = item.getBoundingClientRect();
+    const from = (origin || item).getBoundingClientRect();
+    const fl = makeFlyer(item, to);
+    const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+    const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+    const anim = fl.animate(
+      [
+        { transform: `translate(${dx}px, ${dy}px) scale(1.25)`, opacity: 0 },
+        { opacity: 1, offset: 0.2 },
+        { transform: 'none', opacity: 1 },
+      ],
+      { duration: FLY, easing: EASE, fill: 'forwards' }
     );
-    return SLIDE_IN;
+    whenDone(anim, FLY, () => {
+      item.style.visibility = '';
+      fl.remove();
+      if (last) setTimeout(() => pourCurrent(true), 120);   // último ativo também entra: frasco cheio
+    });
+    return FLY + (last ? 120 + POUR : 0);
   }
 
   // ---------- Anel de porcentagem (Sessão 5) ----------
@@ -285,10 +335,10 @@
         el.setAttribute('aria-checked', el === option);
       });
       answerProgress(step);
-      const animTime = addAtivo(step.dataset.ativo);
+      const animTime = addAtivo(step.dataset.ativo, true, option);
       locked = true;
       // Quando um ativo entra, espera a animação terminar + uma pausa para ela ver a bandeja
-      const delay = animTime ? Math.max(ADVANCE_DELAY_ATIVO, animTime + 700) : ADVANCE_DELAY;
+      const delay = animTime ? Math.max(ADVANCE_DELAY_ATIVO, animTime + 250) : ADVANCE_DELAY;
       setTimeout(() => { locked = false; goTo(current + 1); }, delay);
     }
 
@@ -309,9 +359,10 @@
     const submit = e.target.closest('[data-submit]');
     if (submit && !submit.disabled && !locked) {
       answerProgress(submit.closest('.step'));
-      const animTime = addAtivo(submit.closest('.step').dataset.ativo);
+      const lastCard = [...submit.closest('.step').querySelectorAll('[data-toggle].is-selected')].pop();
+      const animTime = addAtivo(submit.closest('.step').dataset.ativo, true, lastCard || submit);
       locked = true;
-      setTimeout(() => { locked = false; goTo(current + 1); }, animTime ? ADVANCE_DELAY_ATIVO : 0);
+      setTimeout(() => { locked = false; goTo(current + 1); }, animTime ? Math.max(ADVANCE_DELAY_ATIVO, animTime + 250) : 0);
     }
   });
 

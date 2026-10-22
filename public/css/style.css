@@ -33,7 +33,7 @@
   --line: #e1e1e1;          /* bordas / trilhos */
   --white: #fff;
 
-  --tray-height: 78px;      /* bandeja de ativos: título (20px) + painel (58px) — reduzida ~30% em 2026-10-16 */
+  --tray-height: 107px;     /* rodapé de ativos (layout de 2026-10-22): linha + título + frasco + respiro */
 
   --font: 'Acumin Pro', Arial, sans-serif;
   --font-cond: 'Acumin Pro Condensed', 'Arial Narrow', sans-serif;
@@ -637,9 +637,10 @@ html, body {
 }
 
 /* =========================================================
-   BANDEJA DE ATIVOS (Sessões 6–10) — fixa no rodapé
+   RODAPÉ DE ATIVOS (Sessão 6 em diante) — layout de 2026-10-22
+   Medidas da imagem enviada pela usuária (rodapé de 107px na tela de 800px)
    ========================================================= */
-.step[data-tray] { padding-bottom: 100px; }   /* conteúdo não fica escondido atrás da bandeja */
+.step[data-tray] { padding-bottom: calc(var(--tray-height) + 22px); }   /* conteúdo não fica atrás do rodapé */
 
 .tray {
   position: fixed;
@@ -648,54 +649,114 @@ html, body {
   z-index: 10;
   width: 100%;
   max-width: 430px;
+  padding: 10px 15.5px calc(27.5px + env(safe-area-inset-bottom, 0px)) 14.5px;
+  background: var(--white);
   transform: translate(-50%, 100%);
   visibility: hidden;
-  transition: transform .5s cubic-bezier(.4, 0, .2, 1), visibility 0s linear .5s;
+  transition: transform .4s cubic-bezier(.4, 0, .2, 1), visibility 0s linear .4s;
+}
+.tray::before {                 /* linha fina no topo, recuada 6,5px das bordas */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 6.5px;
+  right: 6.5px;
+  height: 1px;
+  background: #e3e3e3;
 }
 .tray.is-visible {
   transform: translate(-50%, 0);
   visibility: visible;
-  transition: transform .5s cubic-bezier(.4, 0, .2, 1), visibility 0s;
+  transition: transform .4s cubic-bezier(.4, 0, .2, 1), visibility 0s;
 }
-.tray__title {
-  padding-bottom: 4px;
-  background: var(--white);
-  font-size: 12px;
+.tray__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tray__title,
+.tray__count {
+  font-family: var(--font-cond);
+  font-size: 15px;
   line-height: 16px;
-  font-weight: 700;
-  color: #a3a3a3;
-  text-align: center;
+  font-variation-settings: 'slnt' 12;   /* itálico da Acumin variável */
 }
-.tray__list {
-  list-style: none;
-  overflow: hidden;      /* com muitos ativos, os mais antigos saem pela direita */
+.tray__title { font-weight: 600; color: #999; }
+.tray__count { flex: none; font-weight: 700; color: #000; font-variant-numeric: tabular-nums; }
+
+.tray__body {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
-  height: 58px;
-  padding: 0 10px 6px;
-  background: var(--white);
-  box-shadow: 0 -5px 10px rgba(0, 0, 0, .045);
+  height: 45px;
+  margin-top: 8.5px;
+}
+.tray__bottle {
+  flex: none;
+  width: 14px;
+  height: 45px;
+  overflow: visible;
+}
+.tray__bottle-empty { fill: #dbdce1; }
+.tray__bottle-fill {               /* sobe com transform (funciona também no Safari) */
+  fill: #1c1c1c;
+  transform: translateY(97%)   /* faixa preta fina na base, como na referência */;
+  transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+}
+.tray__bottle.is-receiving { animation: bottleGulp .3s cubic-bezier(.4, 0, .2, 1); }
+@keyframes bottleGulp {          /* o frasco "engole" o ativo */
+  40% { transform: scale(1.12, .94); }
+  100% { transform: none; }
 }
 
+/* Texto inicial e ativo atual ficam centralizados na largura do rodapé */
+.tray__placeholder,
+.tray__slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.tray__placeholder {
+  font-size: 14.5px;
+  line-height: 1.2;
+  color: #d8d9db;
+  text-align: center;
+  padding-left: 22px;            /* não encostar no frasco em telas estreitas */
+  transition: opacity .25s ease;
+}
+.tray.has-ativo .tray__placeholder { opacity: 0; }
+.tray__slot { list-style: none; padding-left: 22px; }
+
+/* Ativo (no rodapé e voando da opção até o rodapé) */
 .ativo {
   display: flex;
   align-items: center;
-  gap: 3px;
-  will-change: transform;   /* animações de entrada/reordenação feitas no quiz.js */
+  gap: 8px;
 }
-.ativo img { display: block; width: auto; height: 40px; }   /* padrão: frascos/texturas novas */
+.ativo img { display: block; width: auto; height: 40px; }   /* padrão: frascos/texturas */
 .ativo--ah img { width: 43px; height: 32px; }      /* textura da referência (Ácido Hialurônico) */
 .ativo--largo img { width: 46px; height: auto; }   /* imagem horizontal (Acetyl Hexapeptide-8) */
 .ativo--retinal img { width: 39px; height: 40px; }
-.ativo--retinal { gap: 1px; }
 .ativo--pdrn img { width: 38px; height: 38px; }
-.ativo { flex: none; }   /* não espremer os itens quando a fila passa da largura */
 .ativo span {
-  font-size: 8.6px;
-  line-height: 10.6px;
+  font-size: 13px;
+  line-height: 15px;
   font-weight: 700;
-  color: #75828b;
+  color: #4b4b4b;
+}
+.ativo--voando {                 /* cópia que voa da opção marcada até o rodapé */
+  position: fixed;
+  z-index: 30;
+  margin: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 /* =========================================================
@@ -852,10 +913,10 @@ html, body {
   .question__title--photo + .pains__subtitle { margin-top: 2px; }
   .step--pains .question__title--photo { margin-top: 26px; }
   .pains__grid { row-gap: 10px; margin-top: 12px; }
-  .pain-card { min-height: 112px; padding-top: 6px; }
-  .pain-card img { width: 80px; height: 78px; }
+  .pain-card { min-height: 108px; padding-top: 6px; }
+  .pain-card img { width: 80px; height: 74px; }
   .pain-card span { margin-top: 7px; }
-  .btn-continue { margin-top: 18px; }
+  .btn-continue { margin-top: 18px; bottom: calc(var(--tray-height) + 10px); }
 }
 
 /* Telas estreitas (≤ 365 px): texto longo das opções quebra em 2 linhas em vez de ser cortado */
@@ -916,4 +977,20 @@ html, body {
   .analysis__steps li { padding-top: 8px; }
   .analysis__steps span { margin-top: 8px; }
   .analysis__bottle { margin-top: 40px; }
+}
+
+/* Rodapé de ativos mais compacto em telas baixas */
+@media (max-height: 740px) {
+  :root { --tray-height: 86px; }
+  .tray { padding-top: 8px; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+  .tray__body { height: 40px; margin-top: 6px; }
+  .tray__bottle { height: 40px; width: 12.5px; }
+}
+@media (max-height: 600px) {
+  :root { --tray-height: 76px; }
+  .tray { padding-top: 7px; padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }
+  .tray__title, .tray__count { font-size: 13.5px; }
+  .tray__body { height: 38px; margin-top: 5px; }
+  .tray__bottle { height: 38px; width: 12px; }
+  .tray__placeholder { font-size: 14px; }
 }

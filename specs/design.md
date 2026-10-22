@@ -120,34 +120,38 @@ Pílula de 250×51 px, fundo `--blue`, texto branco condensado de 24 px, brilho 
 
 ### Botão CONTINUAR (Sessão 9)
 - Pílula de 153×50,5 px, 38 px abaixo da grade. Mesmo estilo do CTA da capa, com texto condensado de 22,7 px em maiúsculas.
-- **Sempre visível:** `position: sticky` com `bottom: calc(var(--tray-height) + 16px)`, onde `--tray-height` = 78 px (título + painel da bandeja).
+- **Sempre visível:** `position: sticky` com `bottom: calc(var(--tray-height) + 16px)` (10 px em telas ≤ 740 px), onde `--tray-height` é a altura do rodapé de ativos (107 / 86 / 76 px conforme a altura da tela).
   - Em telas altas (800 px, como a referência), fica no lugar original.
-  - Em telas baixas, gruda 16 px acima da bandeja de ativos e flutua sobre os cards.
+  - Em telas baixas, gruda logo acima do rodapé de ativos, sem cobrir os cards.
   - Para isso funcionar, o `.app` usa `overflow-x: clip`. Não usar `hidden`: ele cria um contêiner de rolagem e quebra o sticky.
 - Desativado: fundo sólido `#dbe5f0`, sem brilho. Não usar opacidade, porque o botão pode ficar por cima das fotos.
 
-### Bandeja de ativos (Sessões 6–17)
-- Fixa no rodapé, com a mesma largura do contêiner.
-- **Tamanho reduzido ~30% em relação à referência** (pedido da usuária, 2026-10-16):
-  - Título "Combinação ideal para sua pele:": 12 / 16 px, peso 700, `#a3a3a3`, centralizado, sobre fundo branco.
-  - Painel branco de 58 px de altura com sombra superior `0 -5px 10px rgba(0,0,0,.045)`, padding de 10 px nas laterais e 6 px embaixo.
-  - `--tray-height` = 78 px (usado pelo botão CONTINUAR sticky).
-- Item: imagem + nome em 8,6 / 10,6 px, peso 700, `#75828b`. Espaço de 10 px entre itens.
+### Rodapé de ativos (Sessão 6 em diante) — layout de 2026-10-22
+Referência: imagem enviada pela usuária em 2026-10-22 (Sessão 6 com o rodapé novo). **Substitui a bandeja anterior** (fila de ativos lado a lado com FLIP).
+- **Estrutura** (370×800): fixo no rodapé, largura do contêiner, fundo branco, 107 px de altura (`--tray-height`).
+  - Linha fina no topo `#e3e3e3`, recuada 6,5 px das bordas.
+  - Cabeçalho: "Combinação ideal para sua pele:" (condensada, 15 px, peso 600, itálico, `#999`) à esquerda e contador **"x/N"** (condensada, 15 px, peso 700, itálico, preto) à direita.
+  - Corpo de 45 px: **frasquinho** à esquerda (14×45 px, mesmo contorno do frasco da análise, vazio `#dbdce1`, preto `#1c1c1c` com 3% na base mesmo vazio) e, centralizado na largura, o texto "Responda para revelar o primeiro ativo" (14,5 px, `#d8d9db`) ou o **ativo atual** (imagem + nome em 13 px, peso 700, `#4b4b4b`).
+  - Padding: 10 px em cima, 14,5/15,5 px nas laterais, 27,5 px embaixo (+ área segura do iPhone).
+  - Telas ≤ 740 px: rodapé de 86 px (frasco 40 px). Telas ≤ 600 px: 76 px.
+- **N automático**: quantidade de perguntas com `data-ativo` (hoje 11). Aparece em toda sessão com `data-tray`, já em 0/N na idade.
+- **Animação** (rápida, no `quiz.js`, Web Animations API):
+  - Ao responder, uma cópia do ativo **voa da opção marcada até o centro do rodapé** (0,45 s, `cubic-bezier(.4,0,.2,1)`, começa 1,25× e transparente). Na Sessão 9 sai do último card de dor marcado.
+  - Ao mesmo tempo, o **ativo anterior encolhe e entra no frasquinho** (0,35 s, aceleração ease-in, até 12% do tamanho). Ao chegar, o frasco dá uma leve "engolida" (0,3 s) e o **preto sobe** 1/N (transição de 0,35 s via `transform`, que funciona também no Safari).
+  - O contador sobe na hora da resposta. Na **última pergunta**, o último ativo também entra no frasco depois de pousar: **frasco cheio, N/N**.
+  - O quiz avança 0,85 s depois da resposta (1,2 s na última). Antes eram 1,4 s.
+  - Cada animação termina pelo evento **ou** por tempo (`whenDone`), para não deixar cópias presas se a aba ficar em segundo plano.
+- Item do ativo:
   - Ácido Hialurônico: textura recortada da referência, `.ativo--ah` (43×32 px).
   - Retinal: 39×40 px (recorte da referência).
   - PDRN: 38×38 px.
   - Demais ativos (GHK-Cu, Pentapeptide-4, Propilenoglicol, Glutationa, Niacinamida, Tetrapeptide-7, Exo Skin): padrão `.ativo img` com 40 px de altura e largura automática, gerados da pasta `Ativos/` (bordas recortadas, salvos em 114 px de altura).
   - Acetyl Hexapeptide-8: imagem horizontal, `.ativo--largo` (46 px de largura, altura automática).
   - Tetrapeptide-7: o original tinha fundo cinza liso; ele foi tornado transparente (`prep3.js`) para não aparecer como retângulo na bandeja.
-- Itens não encolhem (`flex: none`) e a lista tem `overflow: hidden`: quando a fila passar da largura, os ativos mais antigos saem pela direita.
 - **Imagens de ativos:** usar texturas, moléculas ou imagens neutras, **nunca o frasco/embalagem de outra marca**. Desde 2026-10-16 todas as imagens da pasta `Ativos/` seguem essa regra.
-- Entrada da bandeja: sobe do rodapé (`translateY 100%→0`, 0,5 s).
-- Entrada de cada ativo (feita no `quiz.js`, técnica FLIP):
-  - o ativo novo desliza **da esquerda para a direita**, vindo de fora da tela (`opacity 0→1`, 0,6 s, `cubic-bezier(.4,0,.2,1)`);
-  - ele fica na **primeira posição** e **empurra os anteriores para a direita**;
-  - **ninguém troca de lugar depois**.
-- Ordem resultante: o mais recente à esquerda. Na Sessão 9 fica **Retinal, Ácido Hialurônico**, o inverso da imagem de referência; aprovado pela usuária em 2026-10-06.
-- As sessões com bandeja têm `padding-bottom: 100px`, para o conteúdo não ficar escondido em telas baixas.
+- Entrada do rodapé: sobe da borda inferior (`translateY 100%→0`, 0,4 s) ao entrar na Sessão 6.
+- As sessões com rodapé têm `padding-bottom: calc(var(--tray-height) + 22px)`, para o conteúdo não ficar escondido.
+- Auditoria de responsividade refeita com o rodapé novo (320×568 a 1366×657, fonte normal / reserva / texto ampliado): tudo ok.
 
 ### Anel de resultado (Sessão 5)
 - SVG de 139 px, raio de 63,25 e traço de 12,5.
