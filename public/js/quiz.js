@@ -324,16 +324,15 @@
     if (!animate) renderTray();
   }
 
-  // Versão de teste (pílulas): o rodapé mostra o ativo novo (pílula com borda azul, à esquerda)
-  // e o anterior (pílula cinza, à direita). Quando chega um terceiro, o mais antigo entra no frasco.
-  // Na última pergunta, os dois que sobraram entram no frasco: frasco cheio.
+  // Versão de teste (pílulas): o ativo novo chega em uma pílula com borda azul; o anterior fica
+  // cinza ao lado dele por um instante e logo entra no frasco (como na versão original: a cada
+  // resposta, o ativo anterior entra no produto). Na última pergunta, o último também entra: frasco cheio.
   // Retorna quanto tempo a animação leva (0 se nada mudou). Regra: um ativo por pergunta.
+  const GRAY_HOLD = 220;   // tempo que o anterior fica cinza ao lado do novo antes de entrar no frasco
   function addAtivo(id, animate = true, origin = null) {
     const novo = (id || '').split(/\s+/).filter(Boolean).find((x) => !collected.includes(x));
     const tpl = novo && document.getElementById(`ativo-${novo}`);
     if (!tpl) return 0;
-    const items = [...traySlot.children];
-    if (items.length >= 2) pourItem(items[items.length - 1], animate);   // o mais antigo entra no frasco
     const prev = traySlot.firstElementChild;
     const prevFrom = prev && animate ? prev.getBoundingClientRect() : null;
     if (prev) prev.classList.add('is-prev');
@@ -344,24 +343,21 @@
     item.dataset.ativo = novo;
     traySlot.prepend(item);
     const last = collected.length === TOTAL_ATIVOS;
-    const pourRest = (anim) => {
-      pourItem(traySlot.lastElementChild, anim);
-      if (anim) setTimeout(() => pourItem(traySlot.firstElementChild, true), 150);
-      else pourItem(traySlot.firstElementChild, false);
-    };
     if (!animate) {
-      if (last) pourRest(false);
+      pourItem(prev, false);
+      if (last) pourItem(item, false);
       renderTray();
       return 0;
     }
     renderTray();
-    // O anterior desliza para a direita (FLIP), abrindo espaço para o novo
+    // O anterior desliza para a direita (FLIP), fica cinza e logo entra no frasco
     if (prev) {
       const to = prev.getBoundingClientRect();
       prev.animate(
         [{ transform: `translate(${prevFrom.left - to.left}px, ${prevFrom.top - to.top}px)` }, { transform: 'none' }],
-        { duration: 300, easing: EASE }
+        { duration: GRAY_HOLD, easing: EASE }
       );
+      setTimeout(() => pourItem(prev, true), GRAY_HOLD);
     }
     item.style.visibility = 'hidden';
     const to = item.getBoundingClientRect();
@@ -377,12 +373,13 @@
       ],
       { duration: FLY, easing: EASE, fill: 'forwards' }
     );
+    const pourEnd = prev ? GRAY_HOLD + POUR : 0;
     whenDone(anim, FLY, () => {
       item.style.visibility = '';
       fl.remove();
-      if (last) setTimeout(() => pourRest(true), 120);   // último: os dois entram no frasco
+      if (last) setTimeout(() => pourItem(item, true), Math.max(120, pourEnd - FLY + 60));   // último também entra: frasco cheio
     });
-    return FLY + (last ? 120 + 150 + POUR : 0);
+    return last ? Math.max(FLY + 120, pourEnd + 60) + POUR : Math.max(FLY, pourEnd);
   }
 
   // ---------- Anel de porcentagem (Sessão 5) ----------
