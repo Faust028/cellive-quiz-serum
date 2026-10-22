@@ -266,7 +266,19 @@
     // 3% de preto na base mesmo vazio (como na referência); cheio = 0%
     trayFill.style.transform = `translateY(${(1 - inBottle / TOTAL_ATIVOS) * 97}%)`;
     tray.classList.toggle('has-ativo', collected.length > 0);   // o texto inicial só aparece antes do 1º ativo
+    fitPills();
   }
+
+  // Pílula cinza (anterior): se uma palavra do nome não cabe inteira, mostra só a imagem
+  function fitPills() {
+    traySlot.querySelectorAll('.ativo--pilula').forEach((p) => {
+      p.classList.remove('is-compacta');
+      const span = p.querySelector('span');
+      if (p.classList.contains('is-prev') && span && span.scrollWidth > span.clientWidth + 0.5) p.classList.add('is-compacta');
+    });
+  }
+  window.addEventListener('resize', fitPills);
+  if (document.fonts) document.fonts.ready.then(fitPills);
 
   // Executa fn uma única vez quando a animação termina — pelo evento ou, se ele não vier
   // (aba em segundo plano, celular economizando bateria), pelo tempo da animação.
@@ -286,9 +298,8 @@
     return fl;
   }
 
-  // O ativo que está no rodapé encolhe e entra no frasco; ao chegar, o preto sobe
-  function pourCurrent(animate) {
-    const item = traySlot.firstElementChild;
+  // Um ativo do rodapé encolhe e entra no frasco; ao chegar, o preto sobe
+  function pourItem(item, animate) {
     if (!item) return;
     inBottle++;
     if (animate) {
@@ -313,24 +324,45 @@
     if (!animate) renderTray();
   }
 
-  // Adiciona o ativo da pergunta. origin = elemento clicado (de onde o ativo sai voando).
+  // Versão de teste (pílulas): o rodapé mostra o ativo novo (pílula com borda azul, à esquerda)
+  // e o anterior (pílula cinza, à direita). Quando chega um terceiro, o mais antigo entra no frasco.
+  // Na última pergunta, os dois que sobraram entram no frasco: frasco cheio.
   // Retorna quanto tempo a animação leva (0 se nada mudou). Regra: um ativo por pergunta.
   function addAtivo(id, animate = true, origin = null) {
     const novo = (id || '').split(/\s+/).filter(Boolean).find((x) => !collected.includes(x));
     const tpl = novo && document.getElementById(`ativo-${novo}`);
     if (!tpl) return 0;
-    pourCurrent(animate);
+    const items = [...traySlot.children];
+    if (items.length >= 2) pourItem(items[items.length - 1], animate);   // o mais antigo entra no frasco
+    const prev = traySlot.firstElementChild;
+    const prevFrom = prev && animate ? prev.getBoundingClientRect() : null;
+    if (prev) prev.classList.add('is-prev');
     collected.push(novo);
     const item = tpl.content.firstElementChild.cloneNode(true);
+    item.classList.add('ativo--pilula');
+    item.querySelectorAll('span br').forEach((br) => br.replaceWith(' '));   // nome numa linha só quando couber
     item.dataset.ativo = novo;
-    traySlot.appendChild(item);
+    traySlot.prepend(item);
     const last = collected.length === TOTAL_ATIVOS;
+    const pourRest = (anim) => {
+      pourItem(traySlot.lastElementChild, anim);
+      if (anim) setTimeout(() => pourItem(traySlot.firstElementChild, true), 150);
+      else pourItem(traySlot.firstElementChild, false);
+    };
     if (!animate) {
-      if (last) pourCurrent(false);
+      if (last) pourRest(false);
       renderTray();
       return 0;
     }
     renderTray();
+    // O anterior desliza para a direita (FLIP), abrindo espaço para o novo
+    if (prev) {
+      const to = prev.getBoundingClientRect();
+      prev.animate(
+        [{ transform: `translate(${prevFrom.left - to.left}px, ${prevFrom.top - to.top}px)` }, { transform: 'none' }],
+        { duration: 300, easing: EASE }
+      );
+    }
     item.style.visibility = 'hidden';
     const to = item.getBoundingClientRect();
     const from = (origin || item).getBoundingClientRect();
@@ -339,7 +371,7 @@
     const dy = from.top + from.height / 2 - (to.top + to.height / 2);
     const anim = fl.animate(
       [
-        { transform: `translate(${dx}px, ${dy}px) scale(1.25)`, opacity: 0 },
+        { transform: `translate(${dx}px, ${dy}px) scale(1.15)`, opacity: 0 },
         { opacity: 1, offset: 0.2 },
         { transform: 'none', opacity: 1 },
       ],
@@ -348,9 +380,9 @@
     whenDone(anim, FLY, () => {
       item.style.visibility = '';
       fl.remove();
-      if (last) setTimeout(() => pourCurrent(true), 120);   // último ativo também entra: frasco cheio
+      if (last) setTimeout(() => pourRest(true), 120);   // último: os dois entram no frasco
     });
-    return FLY + (last ? 120 + POUR : 0);
+    return FLY + (last ? 120 + 150 + POUR : 0);
   }
 
   // ---------- Anel de porcentagem (Sessão 5) ----------
