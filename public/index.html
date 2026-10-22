@@ -511,10 +511,13 @@
       </div>
     </section>
 
-    <!-- ============ SESSÃO 18 — Análise pós-respostas (referências v2: "Analise pós respostas/")
+    <!-- ============ SESSÃO 18 — Análise pós-respostas (referências v3: "Analise pós respostas/", 2026-10-22)
          Duas fases em sequência:
-         Fase 1 (data-analysis ms): "Fazendo uma análise do seu caso" + anel de 0 a 100% + 3 etapas.
-         Fase 2 (data-fill ms): "Combinando os melhores ativos" + frasco grande enchendo de 0 a 100%. -->
+         Fase 1 (data-analysis ms): "Fazendo uma análise do seu caso" + anel contínuo de 0 a 100%
+           + uma etapa por vez (ícone + texto).
+         Fase 2 (data-fill ms): "Montando sua fórmula" + frasco no centro de um círculo com os ativos
+           da visitante; os ativos entram no frasco um por um e o preto sobe até 100%.
+           No fim: "Fórmula concluída!" + check. -->
     <section class="step step--analysis" data-step="18" data-analysis="4000" data-fill="2500">
       <header class="logo" aria-label="Cellive Skin">
         <span class="logo__main">CELLIVE</span><span class="logo__sub">SKIN</span>
@@ -522,7 +525,7 @@
 
       <h2 class="analysis__title" aria-live="polite">
         <span class="analysis__phase analysis__phase--1"><span class="analysis__light">FAZENDO UMA ANALISE</span> DO SEU CASO</span>
-        <span class="analysis__phase analysis__phase--2"><span class="analysis__light">COMBINANDO OS</span> MELHORES ATIVOS</span>
+        <span class="analysis__phase analysis__phase--2"><span class="analysis__light">MONTANDO SUA</span> FÓRMULA</span>
       </h2>
 
       <div class="analysis__body">
@@ -552,20 +555,24 @@
               <path d="M1 20c4 0 4-5 8.5-5s4.5 5 9 5 4.5-5 9-5 4.5 5 8.5 5 3.5 0 5 0"/>
               <path class="dash" d="M1 23.5h40M1 27h40"/>
             </svg>
-            <span>ENTENDENDO SEU TIPO DE PELE</span>
+            <span>Entendendo seu tipo de pele</span>
           </li>
           <li data-at="72">
             <svg class="analysis__icon analysis__icon--small" viewBox="0 0 22 22" aria-hidden="true">
               <circle cx="11" cy="11" r="10"/><path d="M11 6v10M6 11h10"/>
             </svg>
-            <span>REVISANDO COMPATIBILIDADE DOS ATIVOS</span>
+            <span>Revisando sensibilidade da pele</span>
           </li>
         </ol>
       </div>
       </div>
 
-      <!-- Fase 2. Frasco: contorno da imagem enviada pela usuária (viewBox 69×224.25), exibido a 85×276 px. -->
+      <!-- Fase 2. Frasco: contorno da imagem enviada pela usuária (viewBox 69×224.25), exibido a 72×234 px.
+           Os ativos (.formula__ativos) são criados pelo quiz.js a partir dos ativos coletados. -->
       <div class="analysis__p2">
+        <div class="formula">
+        <svg class="formula__ring" viewBox="0 0 323 323" aria-hidden="true"><circle cx="161.5" cy="161.5" r="147.5"/></svg>
+        <ul class="formula__ativos" aria-hidden="true"></ul>
         <svg class="analysis__bottle" viewBox="0 0 69 224.25" aria-hidden="true">
           <defs>
             <clipPath id="frasco">
@@ -575,9 +582,23 @@
           </defs>
           <g clip-path="url(#frasco)">
             <rect class="analysis__bottle-empty" width="69" height="224.25"/>
-            <rect class="analysis__bottle-fill" x="0" y="224.25" width="69" height="224.25"/>
+            <rect class="analysis__bottle-fill" x="0" y="0" width="69" height="224.25"/>
           </g>
         </svg>
+        </div>
+
+        <div class="formula__status" aria-live="polite">
+          <div class="formula__msg formula__msg--combo">
+            <p class="formula__line"><span class="analysis__light">COMBINANDO OS</span> ATIVOS</p>
+            <p class="formula__name" data-formula-name></p>
+          </div>
+          <div class="formula__msg formula__msg--done">
+            <p class="formula__line"><span class="analysis__light">FÓRMULA</span> CONCLUÍDA!</p>
+            <svg class="formula__check" viewBox="0 0 44 44" aria-hidden="true">
+              <circle cx="22" cy="22" r="22"/><path d="M13 22.5l6.2 6L31 16.5"/>
+            </svg>
+          </div>
+        </div>
       </div>
       </div>
     </section>

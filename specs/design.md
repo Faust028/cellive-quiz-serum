@@ -159,20 +159,27 @@ Referência: imagem enviada pela usuária em 2026-10-22 (Sessão 6 com o rodapé
 - Fecha em 100% (`data-percent="100"`). A referência mostrava 88%; a mudança foi aprovada pela usuária em 2026-10-06.
 
 ### Tela de análise (Sessão 18)
-Referências v2 (atualizadas pela usuária em 2026-10-19): `Analise pós respostas/Tela de analise1–6.jpeg`. Imagens 1–3: fase 1 em 10, 55 e 100%; imagens 4–6: fase 2 com o frasco em ~15%, ~53% e 100%.
+Referências v3 (atualizadas pela usuária em 2026-10-22; substituem as v2): `Analise pós respostas/Tela de analise1–5.jpeg`. Imagens 1–3: fase 1 em 10, 63 e 99%, uma etapa por vez; imagem 4: fase 2 com os ativos em círculo em volta do frasco e o primeiro entrando; imagem 5: frasco cheio e "Fórmula concluída!".
 - **Duas fases em sequência** (`.analysis__p1` e `.analysis__p2` no mesmo lugar, troca com fade de 0,45 s):
-  - **Fase 1**: título "FAZENDO UMA ANALISE **DO SEU CASO**" + anel de 0 a 100% + lista de 3 etapas.
-  - **Fase 2**: título "COMBINANDO OS **MELHORES ATIVOS**" + só o frasco grande (sem anel e sem lista), enchendo de 0 a 100%.
+  - **Fase 1**: título "FAZENDO UMA ANALISE **DO SEU CASO**" + anel de 0 a 100% + **uma etapa por vez** (ícone em cima, texto embaixo).
+  - **Fase 2**: título "MONTANDO SUA **FÓRMULA**" + frasco no centro de um círculo tracejado com os ativos da visitante, que **entram no frasco um por um**; embaixo "COMBINANDO OS **ATIVOS**" + nome do ativo que está entrando ("+ÁCIDO HIALURÔNICO"). No fim: "FÓRMULA **CONCLUÍDA!**" + check azul.
 - **Título** (condensada, 23,5 px, `#111`, 99 px abaixo do logo): parte fina em peso 300, parte forte em 700. Troca com fade de 0,4 s.
 - **Anel**: 159 px, raio 72, traço 15, trilho `#e0e0e0`, progresso `--blue` com ponta arredondada, 40 px abaixo do título. Número condensado 48 px, peso 700, `#5d646a`.
-- **Etapas** (lista de 282 px, 36 px abaixo do anel): ícone (lupa com gráfico 29×29; camadas de pele com brilhos 41,5×28; mais no círculo 21,5) + texto Acumin 11,6 px peso 700 em maiúsculas + linha `#e1e1e3`. Estados: futura texto `#dcdcde` e ícone `#dadadc`; ativa texto `#111` e ícone `--blue`; concluída texto `#737373` e ícone `#737375`. Acendem em 0%, 40% e 72% (`data-at`): em 55% a etapa 2 está acesa e em 100% a etapa 3, como nas referências.
-- **Frasco** (formato novo enviado pela usuária em 2026-10-20, imagens do frasco cinza vazio e preto cheio): o contorno foi **extraído da imagem** linha por linha e simplificado (54 pontos) em um único `<path>` do `clipPath#frasco`, viewBox 69×224,25. Exibido a **85×276 px**, com o topo a 268 px do topo da tela. Vazio `#dbdce1`; o preto `#1c1c1c` sobe de baixo para cima (cores tiradas das imagens). O `quiz.js` lê a altura do viewBox, então trocar o desenho não exige mudar o código.
-- **Tempo**: fase 1 em 4 s (`data-analysis="4000"`), pausa de 0,6 s em 100%, fase 2 em 2,5 s (`data-fill="2500"`), pausa de 0,9 s e segue para a próxima sessão, se existir. Total ≈ 8 s. Sem bandeja de ativos nem barra de progresso.
-- **Animação (desde 2026-10-20): Staggered Progress com pausas dramáticas e ease-in-out**, sem mudar o tempo total. Cada fase é dividida em trechos (`PHASE_1` e `PHASE_2` no `quiz.js`, frações do tempo da fase que somam 1); cada trecho usa ease-in-out cúbico:
-  - Fase 1 (anel): 0→40% (27,5%) · pausa (8,75%) · 40→72% (25%) · pausa (11,25%) · 72→94% (16,25%) · pausa de tensão (6,25%) · 94→100% (5%). As pausas começam quando as etapas 2 e 3 acendem.
-  - Fase 2 (frasco): 0→35% (28%) · pausa (10%) · 35→78% (30%) · pausa (12%) · 78→100% (20%).
-- **Número dentro do anel** (Sessões 5 e 18): `fitRingValue()` mede a largura real do texto e, se passar de **66% do miolo** do anel, reduz a fonte. Recalcula quando muda o número de dígitos, quando a fonte termina de carregar e quando a tela muda de tamanho. Os números de 2 dígitos ficam no tamanho da referência; o "100%" diminui um pouco (S18: 48 → ~45 px; S5: 47,6 → 40,9 px). Com a fonte reserva (Arial), o "100%" chegava a 94% (S18) e 105% (S5) do miolo, ou seja, encostava ou passava do círculo.
-- No código, uma escala única de 0 a 200 (`cellive.setAnalysis(step, v)`): 0–100 = anel, 100–200 = frasco.
+- **Etapas** (55 px abaixo do anel, só a atual aparece, troca com fade + 6 px de subida em 0,35 s): ícone azul `--blue` de 46,5 px de altura (lupa com gráfico; camadas de pele com brilhos, 70 px de largura; mais no círculo) + texto Acumin 20 px peso 700 `#111`, 18,5 px abaixo do ícone. Textos como na referência: "ANALISANDO AS RESPOSTAS" (maiúsculas), "Entendendo seu tipo de pele" e "Revisando sensibilidade da pele" (a etapa 3 antes era "Revisando compatibilidade dos ativos"). Trocam em 0%, 40% e 72% (`data-at`).
+- **Fase 2** (medidas em % de um quadrado de 323 px, que encolhe em telas pequenas: `min(323px, 100%, 100svh − 330px)`):
+  - Círculo tracejado de raio 147,5 px (traço 1,6 px `#e9e9eb`, 6/4,2 px), com o topo dos ativos a 224 px do topo da tela.
+  - **Ativos**: os coletados no quiz (11), em círculos de 28 px distribuídos por igual a partir do topo, com a imagem de cada ativo recortada em círculo (ampliada 1,45× para a textura preencher). Aparecem com um leve "pop" em sequência.
+  - **Frasco**: mesmo contorno do frasco enviado em 2026-10-20 (`clipPath#frasco`, viewBox 69×224,25), agora a **72×234 px**, topo a 274 px do topo da tela, com brilho azulado suave atrás. Vazio `#dbdce1`, preto `#1c1c1c` (3% na base, como no frasquinho do rodapé).
+  - Texto: "COMBINANDO OS ATIVOS" condensada 21,4 px (300/700), 23,5 px abaixo do quadrado; nome do ativo condensada 16,5 px peso 400 `#7e7e80` em maiúsculas. Check: círculo `--blue` de 43 px com visto branco, entra com "pop".
+- **Animação e tempo**:
+  - Fase 1: **anel contínuo de 0 a 100% em 4 s, sem pausas** (`data-analysis="4000"`, ease-in-out senoidal). Substitui o Staggered Progress com pausas de 2026-10-20.
+  - 0,35 s em 100% e troca para a fase 2 (fade de 0,45 s).
+  - Fase 2: os ativos entram **um a cada 2,5 s ÷ N** (`data-fill="2500"`, ~0,23 s): cada um encolhe e voa para dentro do frasco (0,42 s), o nome aparece embaixo, o frasco dá uma leve "engolida" e o preto sobe 1/N. Último ativo dentro = frasco 100%.
+  - 0,25 s depois: "Fórmula concluída!" + check. Fica 1,2 s e segue para a próxima sessão, se existir. Total ≈ 8 s.
+  - Cada voo termina pelo evento **ou** pelo tempo (`whenDone`), como no rodapé.
+- **Número dentro do anel** (Sessões 5 e 18): `fitRingValue()` mede a largura real do texto e, se passar de **66% do miolo** do anel, reduz a fonte. Recalcula quando muda o número de dígitos, quando a fonte termina de carregar e quando a tela muda de tamanho. Os números de 2 dígitos ficam no tamanho da referência; o "100%" diminui um pouco (S18: 48 → ~45 px; S5: 47,6 → 40,9 px).
+- No código, uma escala única de 0 a 200 (`cellive.setAnalysis(step, v)`, usada nos testes): 0–100 = anel, 100–200 = quantos ativos já entraram no frasco, 200 = concluída.
+- Telas ≤ 600 px de altura: etapas com ícone de 38 px e texto de 18 px; fase 2 com o quadrado menor (em 320×568 tudo cabe sem rolagem).
 
 ### Foto antes/depois (Sessão 5)
 Imagem de 280×175 px com cantos de 24 px.

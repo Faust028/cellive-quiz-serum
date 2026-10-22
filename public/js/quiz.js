@@ -102,10 +102,56 @@
   if (document.fonts) document.fonts.ready.then(refitRings);
   window.addEventListener('resize', refitRings);
 
-  // ---------- Tela de análise (Sessão 18) ----------
-  // Escala única v de 0 a 200:
-  //  - v 0–100   = fase 1: anel e número de 0 a 100%; etapas acendem em data-at (0, 40, 72);
-  //  - v 100–200 = fase 2: título muda, anel e lista saem e o frasco enche de 0 a 100%.
+  // ---------- Tela de análise (Sessão 18, referências v3 de 2026-10-22) ----------
+  // Fase 1: anel de 0 a 100% em data-analysis ms, contínuo (sem pausas); uma etapa por vez,
+  //         trocando em data-at (0, 40, 72).
+  // Fase 2: "Montando sua fórmula". Os ativos da visitante ficam num círculo em volta do frasco
+  //         e entram nele um por um (todos em data-fill ms); a cada entrada o preto sobe 1/N.
+  //         Frasco cheio → "Fórmula concluída!" + check e segue para a próxima sessão (se houver).
+  // Escala única v de 0 a 200 (cellive.setAnalysis, usada também nos testes):
+  //  v 0–100 = anel; v 100–200 = quantos ativos já entraram no frasco; v = 200 = concluída.
+  const FORMULA_SWITCH = 350;   // anel em 100% → troca para a fase 2
+  const FORMULA_FADE = 450;     // fade entre as fases (igual ao CSS)
+  const FORMULA_POUR = 420;     // ativo voando do círculo para dentro do frasco
+  const FORMULA_HOLD = 1200;    // "Fórmula concluída!" na tela antes de seguir
+  const easeInOutSine = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
+
+  const formulaIds = () => (collected.length ? collected : steps.flatMap((s) => (s.dataset.ativo || '').split(/\s+/).filter(Boolean)));
+  const ativoName = (id) => {   // nome do ativo do template (os <br> viram espaço)
+    const span = document.getElementById(`ativo-${id}`)?.content.querySelector('span');
+    if (!span) return '';
+    return [...span.childNodes].map((n) => (n.nodeName === 'BR' ? ' ' : n.textContent)).join('').replace(/\s+/g, ' ').trim();
+  };
+
+  // Monta o círculo de ativos (uma vez por entrada na sessão), distribuídos por igual a partir do topo
+  function buildFormula(step) {
+    const list = step.querySelector('.formula__ativos');
+    const ids = formulaIds();
+    list.innerHTML = '';
+    ids.forEach((id, i) => {
+      const img = document.getElementById(`ativo-${id}`)?.content.querySelector('img');
+      const li = document.createElement('li');
+      li.className = 'formula__ativo';
+      li.dataset.ativo = id;
+      li.style.setProperty('--i', i);
+      const a = -Math.PI / 2 + (2 * Math.PI * i) / ids.length;
+      li.style.left = `${50 + 45.67 * Math.cos(a)}%`;   // raio do círculo: 147,5 de 323
+      li.style.top = `${50 + 45.67 * Math.sin(a)}%`;
+      if (img) li.appendChild(Object.assign(document.createElement('img'), { src: img.getAttribute('src'), alt: '' }));
+      list.appendChild(li);
+    });
+  }
+
+  // Estado da fase 2 com k ativos já dentro do frasco
+  function setFormula(step, k) {
+    const items = [...step.querySelectorAll('.formula__ativo')];
+    const n = items.length || 1;
+    items.forEach((li, i) => li.classList.toggle('is-in', i < k));
+    step.querySelector('.analysis__bottle-fill').style.transform = `translateY(${(1 - k / n) * 97}%)`;
+    const id = items[Math.min(Math.max(k - 1, 0), items.length - 1)]?.dataset.ativo;
+    step.querySelector('[data-formula-name]').textContent = id ? `+${ativoName(id)}` : '';
+  }
+
   function setAnalysis(step, v) {
     const ring = Math.min(v, 100);
     const circle = step.querySelector('.analysis__progress');
@@ -119,64 +165,78 @@
 
     const items = [...step.querySelectorAll('.analysis__steps li')];
     const activeIdx = items.reduce((acc, li, i) => (ring >= Number(li.dataset.at) ? i : acc), 0);
-    items.forEach((li, i) => {
-      li.classList.toggle('is-active', i === activeIdx);
-      li.classList.toggle('is-done', i < activeIdx);
-    });
+    items.forEach((li, i) => li.classList.toggle('is-active', i === activeIdx));
 
     step.classList.toggle('is-phase-2', v > 100);
-    const fill = Math.min(Math.max((v - 100) / 100, 0), 1);
-    const bottleH = step.querySelector('.analysis__bottle').viewBox.baseVal.height;   // altura do desenho do frasco
-    step.querySelector('.analysis__bottle-fill').setAttribute('y', bottleH * (1 - fill));
+    step.classList.toggle('is-done', v >= 200);
+    if (v > 100) {
+      if (!step.querySelector('.formula__ativo')) buildFormula(step);
+      const n = step.querySelectorAll('.formula__ativo').length;
+      setFormula(step, Math.round(((v - 100) / 100) * n));
+    }
   }
 
-  // Fase 1 em data-analysis ms, pausa de 0,6 s em 100%, fase 2 em data-fill ms,
-  // pausa de 0,9 s com o frasco cheio e segue para a próxima sessão (se houver)
-  const PAUSE_BETWEEN = 600;
-
-  // Staggered Progress com pausas dramáticas: cada fase é dividida em trechos
-  // [alvo na escala 0–200, fração do tempo da fase]. Alvo repetido = pausa.
-  // As frações de cada fase somam 1, então o tempo total não muda.
-  // As pausas da fase 1 começam exatamente quando as etapas acendem (40 e 72).
-  const PHASE_1 = [[40, .275], [40, .0875], [72, .25], [72, .1125], [94, .1625], [94, .0625], [100, .05]];
-  const PHASE_2 = [[135, .28], [135, .10], [178, .30], [178, .12], [200, .20]];
-  const easeInOut = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
-
-  // Monta a linha do tempo: [{ de, para, início (ms), duração (ms) }, ...]
-  function buildTimeline(t1, t2) {
-    const segs = [];
-    let at = 0;
-    let v = 0;
-    const add = (phase, total) => phase.forEach(([to, frac]) => {
-      const dur = frac * total;
-      segs.push({ from: v, to, at, dur });
-      at += dur;
-      v = to;
+  // Um ativo sai do círculo, encolhe e entra no frasco; ao chegar, o preto sobe e o frasco "engole"
+  function pourFormula(step, li, k, done) {
+    const bottle = step.querySelector('.analysis__bottle');
+    const r = li.getBoundingClientRect();
+    const b = bottle.getBoundingClientRect();
+    const dx = b.left + b.width / 2 - (r.left + r.width / 2);
+    const dy = b.top + b.height * 0.45 - (r.top + r.height / 2);
+    step.querySelector('[data-formula-name]').textContent = `+${ativoName(li.dataset.ativo)}`;
+    const anim = li.animate(
+      [{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(.3)`, opacity: 0.3 }],
+      { duration: FORMULA_POUR, easing: 'cubic-bezier(.55, 0, .8, .3)', fill: 'forwards' }
+    );
+    whenDone(anim, FORMULA_POUR, () => {
+      li.classList.add('is-in');
+      anim.cancel();
+      step.querySelector('.analysis__bottle-fill').style.transform =
+        `translateY(${(1 - k / step.querySelectorAll('.formula__ativo').length) * 97}%)`;
+      bottle.classList.remove('is-receiving');
+      void bottle.getBoundingClientRect();   // reinicia a "engolida"
+      bottle.classList.add('is-receiving');
+      done();
     });
-    add(PHASE_1, t1);
-    segs.push({ from: 100, to: 100, at, dur: PAUSE_BETWEEN });   // pausa em 100% antes do frasco
-    at += PAUSE_BETWEEN;
-    add(PHASE_2, t2);
-    return { segs, total: at };
-  }
-
-  function valueAt(timeline, t) {
-    const seg = timeline.segs.find((s) => t < s.at + s.dur) || timeline.segs[timeline.segs.length - 1];
-    const x = Math.min(Math.max((t - seg.at) / seg.dur, 0), 1);
-    return seg.from + (seg.to - seg.from) * easeInOut(x);
   }
 
   function runAnalysis(step) {
-    const timeline = buildTimeline(Number(step.dataset.analysis), Number(step.dataset.fill));
-    const start = performance.now();
+    const run = {};
+    step.analysisRun = run;
+    const alive = () => step.analysisRun === run && step.classList.contains('is-active');
+    const t1 = Number(step.dataset.analysis);
+    const t2 = Number(step.dataset.fill);
+    step.querySelector('.formula__ativos').innerHTML = '';
     setAnalysis(step, 0);
+    buildFormula(step);
+    setFormula(step, 0);
+
+    const start = performance.now();
     const tick = () => {
-      if (!step.classList.contains('is-active')) return;
-      const t = performance.now() - start;
-      const v = t >= timeline.total ? 200 : valueAt(timeline, t);
-      setAnalysis(step, v);
-      if (v < 200) setTimeout(tick, 30);
-      else autoTimer = setTimeout(() => goTo(current + 1), 900);
+      if (!alive()) return;
+      const x = Math.min((performance.now() - start) / t1, 1);
+      setAnalysis(step, 100 * easeInOutSine(x));
+      if (x < 1) { setTimeout(tick, 30); return; }
+      setTimeout(phase2, FORMULA_SWITCH);
+    };
+
+    const phase2 = () => {
+      if (!alive()) return;
+      step.classList.add('is-phase-2');
+      const items = [...step.querySelectorAll('.formula__ativo')];
+      const gap = t2 / Math.max(items.length, 1);
+      let entered = 0;
+      items.forEach((li, i) => setTimeout(() => {
+        if (!alive()) return;
+        pourFormula(step, li, i + 1, () => {
+          if (++entered < items.length || !alive()) return;
+          setTimeout(() => {
+            if (!alive()) return;
+            step.classList.add('is-done');
+            autoTimer = setTimeout(() => goTo(current + 1), FORMULA_HOLD);
+          }, 250);
+        });
+      }, FORMULA_FADE + i * gap));
     };
     setTimeout(tick, 30);
   }

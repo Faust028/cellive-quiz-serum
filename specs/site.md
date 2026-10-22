@@ -80,7 +80,7 @@ Somente **português do Brasil (pt-BR)**.
 | 15 | Pergunta com foto (55%) | Você sente que a pele do seu rosto está menos firme do que antes? → **Glutationa** | Pronta |
 | 16 | Pergunta com foto (60%) | Quando você se olha no espelho sem maquiagem, como sente sua pele? → **Tetrapeptide-7** | Pronta |
 | 17 | Pergunta com foto, 4 opções (65%) | Você já utiliza algum ativo específico para rejuvenescimento? → **Exo Skin** | Pronta |
-| 18 | Análise pós-respostas (animação, sem perguntas) | Fase 1 (4 s): "Fazendo uma análise do seu caso" + anel de 0 a 100% + 3 etapas (Analisando as respostas, Entendendo seu tipo de pele, Revisando compatibilidade dos ativos). Fase 2 (2,5 s): "Combinando os melhores ativos" + frasco grande enchendo de 0 a 100%. Total ≈ 8 s. Referências v2 em `Analise pós respostas/` | Pronta |
+| 18 | Análise pós-respostas (animação, sem perguntas) | Fase 1 (4 s): "Fazendo uma análise do seu caso" + anel contínuo de 0 a 100% (sem pausas) + uma etapa por vez (Analisando as respostas, Entendendo seu tipo de pele, Revisando sensibilidade da pele). Fase 2 (2,5 s): "Montando sua fórmula" + frasco no centro de um círculo com os 11 ativos da visitante, que entram no frasco um por um até ele ficar 100% cheio; depois "Fórmula concluída!" + check. Total ≈ 8 s. Referências v3 (2026-10-22) em `Analise pós respostas/` | Pronta |
 | 19+ | — | Página de venda (a Sessão 18 avança sozinha 0,9 s depois dos 100%, quando houver próxima tela) | **A definir** |
 
 As Sessões 11–17 não têm imagem de referência própria: seguem o layout da Sessão 8 (com foto) ou da Sessão 7 (sem foto), com os textos do PDF.
